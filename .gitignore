@@ -148,7 +148,7 @@ dist
 .vscode-test
 
 #VSCode Configs
-.vscode
+.vscode/
 
 # yarn v2
 .yarn/cache
