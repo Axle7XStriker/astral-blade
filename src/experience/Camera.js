@@ -46,7 +46,7 @@ export default class Camera {
         // the experience.
         this.controller.instance = this.instance.clone();
         this.controller.instance.rotation.reorder("YXZ");
-        this.controller.instance.position.set(5, 5, 5);
+        this.controller.instance.position.set(0, 0, 100);
 
         this.controller.orbitControls = new OrbitControls(
             this.controller.instance,
@@ -58,6 +58,51 @@ export default class Camera {
         this.controller.orbitControls.zoomSpeed = 0.25;
         this.controller.orbitControls.enableDamping = true;
         this.controller.orbitControls.update();
+    }
+
+    /**
+     * Focuses the camera to the given object by moving it on the z-axis, making sure that the
+     * camera is in such a position that the given object appears the largest as compared to any
+     * other position of camera.
+     * @param {THREE.Object3D} object - a three.js object.
+     */
+    focusCamera(object) {
+        if (!(object instanceof THREE.Object3D)) {
+            throw new Error("An object of type {THREE.Object3D} needs to be passed.");
+        }
+        const offset = 1.0;
+        const boundingBox = new THREE.Box3();
+        boundingBox.setFromObject(object);
+        const center = boundingBox.getCenter(new THREE.Vector3());
+        const size = boundingBox.getSize(new THREE.Vector3());
+
+        // Get the max side of the bounding box (fits to width OR height as needed).
+        const maxDim = Math.min(size.x, size.y);
+        const fov = this.instance.fov * (Math.PI / 180);
+        // let cameraZ = Math.abs((maxDim / 4) * Math.tan(fov * 2));
+        let cameraZ = maxDim / 2 / Math.tan(fov / 2);
+        cameraZ = center.z + cameraZ * offset;
+
+        this.instance.position.z = cameraZ;
+
+        const minZ = boundingBox.min.z;
+        const cameraToFarEdge = minZ < 0 ? -minZ + cameraZ : cameraZ - minZ;
+        this.instance.far = cameraToFarEdge * 3;
+        this.instance.updateProjectionMatrix();
+
+        if (this.controller.orbitControls) {
+            this.controller.instance.position.z = cameraZ;
+
+            // Set camera to rotate around center of loaded object
+            this.controller.orbitControls.target = center;
+
+            // Prevent camera from zooming out far enough to create far plane cutoff
+            this.controller.orbitControls.maxDistance = cameraToFarEdge * 2;
+
+            this.controller.orbitControls.saveState();
+        } else {
+            this.instance.lookAt(center);
+        }
     }
 
     /** Updates the camera when the screen is resized. */
@@ -76,13 +121,15 @@ export default class Camera {
      * is rendered.
      */
     update() {
-        // Update debug orbit controls
-        this.controller.orbitControls.update();
+        if (this.controller.active) {
+            // Update debug orbit controls
+            this.controller.orbitControls.update();
 
-        // Apply coordinates
-        this.instance.position.copy(this.controller.instance.position);
-        this.instance.quaternion.copy(this.controller.instance.quaternion);
-        this.instance.updateMatrixWorld(); // To be used in projection
+            // Apply coordinates
+            this.instance.position.copy(this.controller.instance.position);
+            this.instance.quaternion.copy(this.controller.instance.quaternion);
+            this.instance.updateMatrixWorld(); // To be used in projection
+        }
     }
 
     /**

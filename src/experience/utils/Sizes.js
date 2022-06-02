@@ -2,14 +2,20 @@ import EventEmitter from "./EventEmitter.js";
 
 /** Provides and handles everything related to render area size. */
 export default class Sizes extends EventEmitter {
-    constructor() {
+    constructor(_targetElement) {
+        if (_targetElement === undefined) {
+            throw new Error("Need a target element to determine the canvas size.");
+        }
+
         super();
+
+        this.targetElement = _targetElement;
 
         // Viewport size
         this.viewport = {};
         this.$sizeViewport = document.createElement("div");
-        this.$sizeViewport.style.width = "100vw";
-        this.$sizeViewport.style.height = "100vh";
+        this.$sizeViewport.style.width = "100%";
+        this.$sizeViewport.style.height = "100%";
         this.$sizeViewport.style.position = "absolute";
         this.$sizeViewport.style.top = 0;
         this.$sizeViewport.style.left = 0;
@@ -24,13 +30,13 @@ export default class Sizes extends EventEmitter {
 
     /** Called when the window is resized. Obtain the updated render area dimensions. */
     resize() {
-        document.body.appendChild(this.$sizeViewport);
+        this.targetElement.appendChild(this.$sizeViewport);
         this.viewport.width = this.$sizeViewport.offsetWidth;
         this.viewport.height = this.$sizeViewport.offsetHeight;
-        document.body.removeChild(this.$sizeViewport);
+        this.targetElement.removeChild(this.$sizeViewport);
 
-        this.width = window.innerWidth;
-        this.height = window.innerHeight;
+        this.width = this.viewport.width;
+        this.height = this.viewport.height;
 
         this.trigger("resize");
     }

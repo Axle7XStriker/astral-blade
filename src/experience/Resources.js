@@ -1,6 +1,6 @@
 import * as THREE from "three";
-import EventEmitter from "./Utils/EventEmitter.js";
-import Loader from "./Utils/Loader.js";
+import EventEmitter from "./utils/EventEmitter.js";
+import Loader from "./utils/Loader.js";
 
 /** Loads all the graphical assets used in the Experience. */
 export default class Resources extends EventEmitter {

@@ -1,13 +1,14 @@
 import * as THREE from "three";
 import GUI from "lil-gui";
 
-import Time from "./Utils/Time.js";
-import Sizes from "./Utils/Sizes.js";
-import Stats from "./Utils/Stats.js";
+import Time from "./utils/Time.js";
+import Sizes from "./utils/Sizes.js";
+import Stats from "./utils/Stats.js";
 
+import AudioManager from "./AudioManager.js";
+import Camera from "./Camera.js";
 import Resources from "./Resources.js";
 import Renderer from "./Renderer.js";
-import Camera from "./Camera.js";
 import World from "./World.js";
 
 import assets from "./assets.js";
@@ -39,7 +40,7 @@ export default class Experience {
         // which gets triggered before each frame is rendered. Hence during update process,
         // time update happens before any other object update.
         this.time = new Time();
-        this.sizes = new Sizes();
+        this.sizes = new Sizes(this.targetElement);
         this.setConfig();
         this.setDebug();
         this.setStats();
@@ -47,6 +48,7 @@ export default class Experience {
         this.setCamera();
         this.setRenderer();
         this.setResources();
+        this.setAudioManager();
         this.setWorld();
 
         // Events Setup
@@ -93,7 +95,7 @@ export default class Experience {
     }
 
     setCamera() {
-        this.camera = new Camera({ active: true });
+        this.camera = new Camera({ active: false });
     }
 
     setRenderer() {
@@ -104,6 +106,18 @@ export default class Experience {
 
     setResources() {
         this.resources = new Resources(assets);
+    }
+
+    setAudioManager() {
+        this.audioManager = new AudioManager();
+        // this.targetElement.addEventListener(
+        //     "click",
+        //     () => {
+        //         console.log("Audio added.");
+        //         this.audioManager.setupAudio("/assets/preview-3a.mp3");
+        //     },
+        //     { once: true }
+        // );
     }
 
     setWorld() {

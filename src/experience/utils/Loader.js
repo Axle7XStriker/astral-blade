@@ -5,6 +5,7 @@ import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader.js";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader.js";
 import { BasisTextureLoader } from "three/examples/jsm/loaders/BasisTextureLoader.js";
+import { SVGLoader } from "three/examples/jsm/loaders/SVGLoader";
 
 /** An aggregate of various loaders which is used to load assets of different kinds. */
 export default class Loader extends EventEmitter {
@@ -107,6 +108,18 @@ export default class Loader extends EventEmitter {
             extensions: ["hdr"],
             action: (_resource) => {
                 rgbeLoader.load(_resource.source, (_data) => {
+                    this.fileLoadEnd(_resource, _data);
+                });
+            },
+        });
+
+        // SVG
+        const svgLoader = new SVGLoader();
+
+        this.loaders.push({
+            extensions: ["svg"],
+            action: (_resource) => {
+                svgLoader.load(_resource.source, (_data) => {
                     this.fileLoadEnd(_resource, _data);
                 });
             },

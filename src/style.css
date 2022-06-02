@@ -14,3 +14,51 @@ body {
     width: 100vw;
     height: 100vh;
 }
+
+.view {
+    width: 100vw;
+    height: 80vh;
+    position: absolute;
+    top: 10vh;
+    left: 0px;
+    z-index: 0;
+    background: none;
+    opacity: 0;
+}
+.view.show {
+    z-index: 100;
+    opacity: 1;
+}
+.view.hide {
+    display: none;
+}
+
+.view-text {
+    font-family: "futura-pt", sans-serif;
+    font-size: 2vw;
+    color: #68c3c0;
+}
+
+#home {
+    overflow: hidden;
+    pointer-events: none;
+}
+#home .view-text {
+    top: 35%;
+    left: 5%;
+    z-index: 100;
+    position: absolute;
+    text-align: left;
+}
+#home #individual-name {
+    text-transform: uppercase;
+    font-size: 6vw;
+    opacity: 1;
+    font-weight: 100;
+    position: relative;
+}
+#home .individuals-traits {
+    font-size: 3vw;
+    text-transform: uppercase;
+    position: relative;
+}

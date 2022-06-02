@@ -15,9 +15,11 @@ export default class Renderer {
         this.scene = this.experience.scene;
         this.camera = this.experience.camera;
 
+        this.debugParams = { clearColor: "#010101" };
+
         // Debug
         if (this.debug) {
-            this.debugFolder = this.debug.addFolder("renderer");
+            this.debugFolder = this.debug.addFolder("Renderer");
         }
 
         this.usePostprocess = false;
@@ -31,18 +33,16 @@ export default class Renderer {
      * Experience's requirements.
      */
     setInstance() {
-        this.clearColor = "#010101";
-
         // Renderer
         this.instance = new THREE.WebGLRenderer({ antialias: true });
         this.instance.domElement.style.position = "fixed";
-        this.instance.domElement.style.top = 0;
-        this.instance.domElement.style.left = 0;
+        this.instance.domElement.style.top = "0%";
+        this.instance.domElement.style.left = "0%";
         this.instance.domElement.style.width = "100%";
         this.instance.domElement.style.height = "100%";
         this.instance.domElement.style.outline = "none";
 
-        this.instance.setClearColor(this.clearColor, 1);
+        this.instance.setClearColor(this.debugParams.clearColor, 1);
         this.instance.setSize(this.config.width, this.config.height);
         this.instance.setPixelRatio(this.config.pixelRatio);
 
@@ -63,8 +63,8 @@ export default class Renderer {
 
         // Debug
         if (this.debug) {
-            this.debugFolder.addColor(this, "clearColor").onChange(() => {
-                this.instance.setClearColor(this.clearColor);
+            this.debugFolder.addColor(this.debugParams, "clearColor").onChange(() => {
+                this.instance.setClearColor(this.debugParams.clearColor);
             });
 
             this.debugFolder
