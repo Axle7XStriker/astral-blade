@@ -4,6 +4,10 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 
 /** Creates and handles everything related to a Camera. */
 export default class Camera {
+    /**
+     * @param {boolean} _options.needControls - activates camera controller (default: false).
+     * @param {boolean} _options.needHelper - adds camera helper to the scene as well (default: false).
+     */
     constructor(_options = {}) {
         this.experience = new Experience();
         this.config = this.experience.config;
@@ -13,12 +17,15 @@ export default class Camera {
         this.targetElement = this.experience.targetElement;
         this.scene = this.experience.scene;
 
+        this.needControls = _options.needControls === undefined ? false : _options.needControls;
+        this.needHelper = _options.needHelper === undefined ? false : _options.needHelper;
+
         // Setup camera.
         this.setInstance();
 
         // Setup camera controller.
         this.controller = {};
-        this.controller.active = _options.active === undefined ? false : _options.active;
+        this.controller.active = this.needControls;
         this.setController();
     }
 
@@ -29,11 +36,16 @@ export default class Camera {
             25,
             this.config.width / this.config.height,
             0.1,
-            150
+            1500
         );
         this.instance.rotation.reorder("YXZ");
 
         this.scene.add(this.instance);
+
+        if (this.needHelper) {
+            this.instanceHelper = new THREE.CameraHelper(this.instance);
+            this.scene.add(this.instanceHelper);
+        }
     }
 
     /**
@@ -46,7 +58,7 @@ export default class Camera {
         // the experience.
         this.controller.instance = this.instance.clone();
         this.controller.instance.rotation.reorder("YXZ");
-        this.controller.instance.position.set(0, 0, 100);
+        this.controller.instance.position.set(0, 0, 10);
 
         this.controller.orbitControls = new OrbitControls(
             this.controller.instance,
@@ -70,25 +82,33 @@ export default class Camera {
         if (!(object instanceof THREE.Object3D)) {
             throw new Error("An object of type {THREE.Object3D} needs to be passed.");
         }
-        const offset = 1.0;
+        const offset = 1.25;
         const boundingBox = new THREE.Box3();
         boundingBox.setFromObject(object);
         const center = boundingBox.getCenter(new THREE.Vector3());
         const size = boundingBox.getSize(new THREE.Vector3());
 
         // Get the max side of the bounding box (fits to width OR height as needed).
-        const maxDim = Math.min(size.x, size.y);
+        // const maxDim = Math.min(size.x, size.y);
+        const maxDim = size.y;
         const fov = this.instance.fov * (Math.PI / 180);
         // let cameraZ = Math.abs((maxDim / 4) * Math.tan(fov * 2));
         let cameraZ = maxDim / 2 / Math.tan(fov / 2);
         cameraZ = center.z + cameraZ * offset;
 
-        this.instance.position.z = cameraZ;
+        this.instance.position.set(center.x, center.y, cameraZ);
 
         const minZ = boundingBox.min.z;
-        const cameraToFarEdge = minZ < 0 ? -minZ + cameraZ : cameraZ - minZ;
-        this.instance.far = cameraToFarEdge * 3;
+        const cameraToFarEdge = cameraZ - minZ;
+        this.instance.far = cameraToFarEdge * 2;
+
+        const maxZ = boundingBox.max.z;
+        const cameraToNearEdge = cameraZ - maxZ;
+        this.instance.near = cameraToNearEdge * 0.5;
         this.instance.updateProjectionMatrix();
+        if (this.instanceHelper) {
+            this.instanceHelper.update();
+        }
 
         if (this.controller.orbitControls) {
             this.controller.instance.position.z = cameraZ;
@@ -110,6 +130,9 @@ export default class Camera {
         // Update main camera.
         this.instance.aspect = this.config.width / this.config.height;
         this.instance.updateProjectionMatrix();
+        if (this.instanceHelper) {
+            this.instanceHelper.update();
+        }
 
         // Update camera clone(s).
         this.controller.instance.aspect = this.config.width / this.config.height;

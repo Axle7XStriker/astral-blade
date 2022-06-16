@@ -1,5 +1,6 @@
 import * as THREE from "three";
 
+import AboutMe from "./AboutMe.js";
 import Experience from "./Experience.js";
 import Home from "./Home.js";
 import HUD from "./HUD.js";
@@ -20,7 +21,10 @@ export default class World {
         // this.setVirtualAssistant();
         this.setHUD();
 
-        this.setViews();
+        this.currentViewType = "";
+        this.currentView = null;
+        this.setupViews();
+        this.setView("home");
     }
 
     setDebugEnvironment() {
@@ -50,11 +54,11 @@ export default class World {
         this.subjects.push(this.hud);
     }
 
-    setViews() {
+    setupViews() {
         this.views = {
             home: new Home(),
+            aboutMe: new AboutMe(),
         };
-        this.setView("home");
     }
 
     setView(viewType) {
@@ -62,12 +66,22 @@ export default class World {
             console.warn("Undefined/Unsupported view type passed as an argument.");
             return;
         }
+        if (this.currentViewType !== "") {
+            this.currentView.clearView();
+        }
         this.currentViewType = viewType;
         this.currentView = this.views[viewType];
         this.subjects.push(this.currentView);
+        this.currentView.setView();
     }
 
-    resize() {}
+    resize() {
+        this.subjects.forEach((obj) => {
+            if (typeof obj.resize === "function") {
+                obj.resize();
+            }
+        });
+    }
 
     update() {
         this.subjects.forEach((obj) => {

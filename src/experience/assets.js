@@ -12,4 +12,9 @@ export default [
             { name: "hudBoundary", source: "/assets/hud-boundary.svg", type: "vector-graphic" },
         ],
     },
+    {
+        name: "SelfPics",
+        data: {},
+        items: [{ name: "myFace", source: "/assets/ab_face.png", type: "texture" }],
+    },
 ];

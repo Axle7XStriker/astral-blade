@@ -12,6 +12,7 @@ import Renderer from "./Renderer.js";
 import World from "./World.js";
 
 import assets from "./assets.js";
+import InteractiveControls from "./InteractiveControls.js";
 
 /**
  * The top-level class (singleton) that holds everything related to a Three.js Experience.
@@ -36,6 +37,7 @@ export default class Experience {
         Experience.instance = this;
 
         this.targetElement = _options.targetElement;
+        this.debugParams = { showThirdPersonView: false };
         // Creating a Time instance also results in its update method being called simultaneously
         // which gets triggered before each frame is rendered. Hence during update process,
         // time update happens before any other object update.
@@ -49,6 +51,7 @@ export default class Experience {
         this.setRenderer();
         this.setResources();
         this.setAudioManager();
+        this.setInteractiveControls();
         this.setWorld();
 
         // Events Setup
@@ -80,6 +83,7 @@ export default class Experience {
         if (this.config.debug) {
             // GUI used to tweak various modifiable parameters of the Experience.
             this.debug = new GUI();
+            this.debugFolder = this.debug.addFolder("Experience");
         }
     }
 
@@ -95,7 +99,26 @@ export default class Experience {
     }
 
     setCamera() {
-        this.camera = new Camera({ active: false });
+        this.mainCamera = new Camera({ needControls: false, needHelper: this.config.debug });
+        if (this.config.debug) {
+            this.thirdPersonCamera = new Camera({ needControls: true, needHelper: false });
+            // Active camera is the main camera at the start.
+            this.thirdPersonCamera.controller.orbitControls.enabled = false;
+        }
+        if (this.debug) {
+            this.debugFolder
+                .add(this.debugParams, "showThirdPersonView")
+                .onChange((shouldEnable) => {
+                    if (shouldEnable) {
+                        this.thirdPersonCamera.controller.orbitControls.enabled = true;
+                        this.activeCamera = this.thirdPersonCamera;
+                    } else {
+                        this.thirdPersonCamera.controller.orbitControls.enabled = false;
+                        this.activeCamera = this.mainCamera;
+                    }
+                });
+        }
+        this.activeCamera = this.mainCamera;
     }
 
     setRenderer() {
@@ -120,6 +143,14 @@ export default class Experience {
         // );
     }
 
+    setInteractiveControls() {
+        this.interactiveControls = new InteractiveControls(
+            this.activeCamera.instance,
+            this.renderer.instance.domElement
+        );
+        this.interactiveControls.disable();
+    }
+
     setWorld() {
         this.world = new World();
     }
@@ -132,11 +163,11 @@ export default class Experience {
     update() {
         if (this.stats) this.stats.update();
 
-        this.camera.update();
-
-        if (this.world) this.world.update();
+        this.activeCamera.update();
 
         if (this.renderer) this.renderer.update();
+
+        if (this.world) this.world.update();
 
         window.requestAnimationFrame(() => {
             this.update();
@@ -153,9 +184,12 @@ export default class Experience {
 
         this.config.pixelRatio = Math.min(Math.max(window.devicePixelRatio, 1), 2);
 
-        if (this.camera) this.camera.resize();
+        if (this.mainCamera) this.mainCamera.resize();
+        if (this.thirdPersonCamera) this.thirdPersonCamera.resize();
 
         if (this.renderer) this.renderer.resize();
+
+        if (this.interactiveControls) this.interactiveControls.resize();
 
         if (this.world) this.world.resize();
     }

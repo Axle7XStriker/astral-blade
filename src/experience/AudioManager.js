@@ -10,7 +10,7 @@ export default class AudioManager {
         // Create an {AudioListener} and add it to the camera.
         this.audioListener = new THREE.AudioListener();
         this.fftSize = 512;
-        this.experience.camera.instance.add(this.audioListener);
+        this.experience.mainCamera.instance.add(this.audioListener);
     }
 
     setupAudio(src) {

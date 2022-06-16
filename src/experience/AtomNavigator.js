@@ -13,8 +13,9 @@ export default class AtomNavigator {
     constructor(_options = {}) {
         // Constants
         this.experience = new Experience();
-        this.camera = this.experience.camera;
+        this.camera = this.experience.mainCamera;
         this.sizes = this.experience.sizes;
+        this.time = this.experience.time;
         this.debug = this.experience.debug;
         this.audioManager = this.experience.audioManager;
 
@@ -150,7 +151,7 @@ export default class AtomNavigator {
             if (this.currentIntersect !== null && this.currentIntersect.object.uuid === uuid)
                 return;
 
-            this.electronsConfig[uuid].theta += 0.005;
+            this.electronsConfig[uuid].theta += this.time.delta * 0.00005;
             const position = compute3DEllipseCoordinates(this.electronsConfig[uuid]);
             const electron = this.electrons.getObjectByProperty("uuid", uuid);
             electron.position.set(position.x, position.y, position.z);
@@ -251,7 +252,11 @@ function createEllipse(_options = {}) {
 
     const pointsOnCurve = curve.getPoints(100);
     const geometry = new THREE.BufferGeometry().setFromPoints(pointsOnCurve);
-    const material = new THREE.LineBasicMaterial({ color: _options.color || 0x68c3c0 });
+    const material = new THREE.LineBasicMaterial({
+        color: _options.color || 0x68c3c0,
+        transparent: true,
+        opacity: 0.1,
+    });
 
     const ellipse = new THREE.Line(geometry, material);
 

@@ -1,4 +1,5 @@
 import * as THREE from "three";
+
 import Experience from "./Experience.js";
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
@@ -13,7 +14,6 @@ export default class Renderer {
         this.time = this.experience.time;
         this.sizes = this.experience.sizes;
         this.scene = this.experience.scene;
-        this.camera = this.experience.camera;
 
         this.debugParams = { clearColor: "#010101" };
 
@@ -92,7 +92,10 @@ export default class Renderer {
         /**
          * Render pass
          */
-        this.postProcess.renderPass = new RenderPass(this.scene, this.camera.instance);
+        this.postProcess.renderPass = new RenderPass(
+            this.scene,
+            this.experience.activeCamera.instance
+        );
 
         /**
          * Effect composer
@@ -139,7 +142,7 @@ export default class Renderer {
         if (this.usePostprocess) {
             this.postProcess.composer.render();
         } else {
-            this.instance.render(this.scene, this.camera.instance);
+            this.instance.render(this.scene, this.experience.activeCamera.instance);
         }
 
         if (this.stats) {

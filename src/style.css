@@ -50,6 +50,13 @@ body {
     position: absolute;
     text-align: left;
 }
+@media (orientation: portrait) {
+    #home .view-text {
+        top: 20%;
+        left: 30%;
+        text-align: center;
+    }
+}
 #home #individual-name {
     text-transform: uppercase;
     font-size: 6vw;
@@ -60,5 +67,40 @@ body {
 #home .individuals-traits {
     font-size: 3vw;
     text-transform: uppercase;
+    position: relative;
+}
+
+#about-me {
+    overflow: hidden;
+    pointer-events: none;
+}
+#about-me .view-text {
+    top: 15%;
+    left: 5%;
+    width: 45vw;
+    z-index: 100;
+    position: absolute;
+    text-align: left;
+}
+@media (orientation: portrait) {
+    #about-me .view-text {
+        top: 10%;
+        left: 27.5%;
+        text-align: center;
+    }
+}
+#about-me .view-text-header {
+    text-transform: uppercase;
+    font-size: 5vw;
+    font-weight: 100;
+    position: relative;
+}
+#about-me .view-text-subheader {
+    font-size: 2.2vw;
+    font-weight: bold;
+    position: relative;
+}
+#about-me .view-text-body {
+    font-size: 1.3vw;
     position: relative;
 }

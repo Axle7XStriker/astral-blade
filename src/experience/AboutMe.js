@@ -1,15 +1,11 @@
 import * as THREE from "three";
-import { ObjectControls } from "threejs-object-controls";
-import Typed from "typed.js";
 
-import AtomNavigator from "./AtomNavigator.js";
 import Experience from "./Experience.js";
+import InteractiveParticlesImage from "./InteractiveParticlesImage.js";
 import { fitObjectToBoundingBox } from "./utils/common.js";
 
-/** Home view of the experience. */
+/** About-Me view of the experience. */
 export default class Home {
-    #typedIndividualsTraits;
-
     constructor(_options = {}) {
         this.experience = new Experience();
         this.scene = this.experience.scene;
@@ -37,56 +33,37 @@ export default class Home {
             this.sizes.width / this.sizes.height + 1
         );
         this.modelView.add(this.container);
-        this.#setupViewText();
-        this.#setupAtomNavigator();
-        this.#arrangeSubjects();
+        this.#setupInteractiveParticleImage();
+        this.interactiveParticleImage.on("finishInit", () => {
+            this.#setupViewText();
+            this.#arrangeSubjects();
+            this.#setupDebugEnvironment();
 
-        // this.#setupDebugEnvironment();
+            this.finishInit = true;
+        });
     }
 
-    #setupAtomNavigator() {
-        this.atomNavigator = new AtomNavigator({
-            nucleusRadius: 1.0,
-            electronCount: 7,
-            electronNucleusSizeRatio: 0.2,
+    #setupInteractiveParticleImage() {
+        this.interactiveParticleImage = new InteractiveParticlesImage({
+            visibilityThreshold: 34,
         });
-        // console.log(this.atomNavigator);
 
-        var controls = new ObjectControls(
-            this.camera.instance,
-            this.renderer.instance.domElement,
-            this.atomNavigator.modelView
-        );
-        controls.disableZoom();
-        controls.enableHorizontalRotation();
-        controls.enableVerticalRotation();
-        controls.setRotationSpeed(0.01);
-        controls.setRotationSpeedTouchDevices(0.01);
-
-        this.modelView.add(this.atomNavigator.modelView);
-        this.subjects.push(this.atomNavigator);
+        this.modelView.add(this.interactiveParticleImage.modelView);
+        this.subjects.push(this.interactiveParticleImage);
     }
 
     #setupViewText() {
-        this.#setupTextArea();
-
-        // Animate individual's traits.
-        this.#typedIndividualsTraits = new Typed("#home .typed-element", {
-            stringsElement: "#home .typed-strings",
-            typeSpeed: 100,
-            backDelay: 2100,
-            backSpeed: 100,
-            loop: true,
-            cursorChar: "█",
-        });
+        this.#setupTextArea(
+            this.interactiveParticleImage.width,
+            this.interactiveParticleImage.height
+        );
     }
 
-    #setupTextArea() {
+    #setupTextArea(width, height) {
         this.textPlane = new THREE.Mesh(
-            new THREE.PlaneBufferGeometry(1, 1),
+            new THREE.PlaneBufferGeometry(width, height),
             new THREE.MeshBasicMaterial({
-                wireframe: true,
-                depthWrite: false,
+                wireframe: this.experience.config.debug,
                 transparent: true,
                 opacity: this.experience.config.debug ? 1 : 0,
             })
@@ -109,7 +86,7 @@ export default class Home {
                 )
             );
             fitObjectToBoundingBox(
-                this.atomNavigator.modelView,
+                this.interactiveParticleImage.modelView,
                 new THREE.Box3(
                     new THREE.Vector3(0, -1, -(this.sizes.width / this.sizes.height + 1)),
                     new THREE.Vector3(
@@ -136,7 +113,7 @@ export default class Home {
                 )
             );
             fitObjectToBoundingBox(
-                this.atomNavigator.modelView,
+                this.interactiveParticleImage.modelView,
                 new THREE.Box3(
                     new THREE.Vector3(
                         -this.sizes.width / this.sizes.height,
@@ -161,27 +138,27 @@ export default class Home {
     }
 
     setView() {
-        const homeViewDom = document.querySelector("#home.view");
+        const aboutMeViewDom = document.querySelector("#about-me.view");
 
         // Make the HTML part of the view visible and start animating.
-        homeViewDom.classList.remove("hide");
-        homeViewDom.classList.add("show");
-        this.#typedIndividualsTraits.start();
+        aboutMeViewDom.classList.remove("hide");
+        aboutMeViewDom.classList.add("show");
 
         // Add home view model to the scene.
         this.scene.add(this.modelView);
 
         // Adjust camera to focus on the view.
-        this.camera.focusCamera(this.modelView);
+        this.interactiveParticleImage.on("finishInit", () => {
+            this.camera.focusCamera(this.modelView);
+        });
     }
 
     clearView() {
-        const homeViewDom = document.querySelector("#home.view");
+        const aboutMeViewDom = document.querySelector("#about-me.view");
 
         // Make the HTML part of the view invisible and stop animating.
-        homeViewDom.classList.remove("show");
-        homeViewDom.classList.add("hide");
-        this.#typedIndividualsTraits.stop();
+        aboutMeViewDom.classList.remove("show");
+        aboutMeViewDom.classList.add("hide");
 
         // Add home view model to the scene.
         this.scene.remove(this.modelView);
@@ -194,15 +171,17 @@ export default class Home {
             }
         });
 
-        this.#arrangeSubjects();
-        this.container.scale.set(
-            this.sizes.width / this.sizes.height,
-            1,
-            this.sizes.width / this.sizes.height + 1
-        );
+        if (this.finishInit) {
+            this.#arrangeSubjects();
+            this.container.scale.set(
+                this.sizes.width / this.sizes.height,
+                1,
+                this.sizes.width / this.sizes.height + 1
+            );
 
-        // Adjust camera to focus on the view.
-        this.camera.focusCamera(this.modelView);
+            // Adjust camera to focus on the view.
+            this.camera.focusCamera(this.modelView);
+        }
     }
 
     update() {
