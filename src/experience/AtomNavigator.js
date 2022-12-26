@@ -1,38 +1,46 @@
+import EventEmitter from "events";
 import * as THREE from "three";
 
 import Experience from "./Experience.js";
+import { VIEWS } from "./configs.js";
 import { max, avg, modulate, modulateSphericalGeometry } from "./utils/common.js";
 
 /** A navigator in the form of an atom that can be used to view different aspects of the experience. */
-export default class AtomNavigator {
+export default class AtomNavigator extends EventEmitter {
     /**
      * @param {float} _options.nucleusRadius - radius of the atom's nucleus (default: 1.0).
-     * @param {int} _options.electronCount - number of electrons that will revolve around the nucleus (default: 0).
      * @param {float} _options.electronNucleusSizeRatio - ratio of the radius of electron to the radius of nucleus (default: 0.2).
      */
     constructor(_options = {}) {
         // Constants
+        super();
         this.experience = new Experience();
         this.camera = this.experience.mainCamera;
+        this.scene = this.experience.scene;
         this.sizes = this.experience.sizes;
         this.time = this.experience.time;
         this.debug = this.experience.debug;
         this.audioManager = this.experience.audioManager;
+        this.interactiveControls = this.experience.interactiveControls;
 
         this.nucleusRadius = _options.nucleusRadius || 1.0;
-        this.electronCount = _options.electronCount || 0;
         this.electronNucleusSizeRatio = _options.electronNucleusSizeRatio || 0.2;
         this.debugParams = { nucleusColor: 0x68c3c0, electronColor: 0x68c3c0 };
 
+        this.init();
+    }
+
+    init() {
         // Debug GUI
         if (this.debug) {
             this.debugFolder = this.debug.addFolder("AtomNavigator");
         }
 
+        this.setMouseRaycaster();
+
         this.modelView = new THREE.Group();
         this.modelView.add(this.createAtomViewer());
 
-        this.setMouseRaycaster();
         this.setDebugEnvironment();
     }
 
@@ -51,9 +59,8 @@ export default class AtomNavigator {
         this.atom.add(this.nucleus);
 
         this.electrons = new THREE.Group();
-        this.electronSpheres = [];
         this.electronsConfig = {};
-        for (let i = 0; i < this.electronCount; i++) {
+        Object.keys(VIEWS).forEach((viewKey) => {
             // Value of ellipse's radii varies from nucleusRadius(x2.0) to nucleusRadius(x3.0).
             const a = this.nucleusRadius * 2.0 + Math.random() * this.nucleusRadius * 1.0;
             const b = this.nucleusRadius * 2.0 + Math.random() * this.nucleusRadius * 1.0;
@@ -73,7 +80,7 @@ export default class AtomNavigator {
                 rotateZ,
             });
 
-            // Spawn the electron on the elliptical orbit on the position specified by the above parameters.
+            // Spawn the electron sphere on the elliptical orbit on the position specified by the above parameters.
             const position = compute3DEllipseCoordinates({
                 a,
                 b,
@@ -90,47 +97,111 @@ export default class AtomNavigator {
                 z: position.z,
             });
 
+            // An electron will consists multiple spheres of gradually decreasing sizes positioned
+            // very close to each other in the order of decreasing size so as to create an effect of
+            // a moving electron with a light tail when animating its revolution around the nucleus.
             const electronOrbit = new THREE.Group();
-            electronOrbit.add(electron).add(orbit);
-            this.electronSpheres.push(electron);
+            const electronTrail = new THREE.Group();
+            electronTrail.add(electron);
+            electronOrbit.add(electronTrail).add(orbit);
+            this.objectsToCheck.push(electronTrail);
             // Rotate the electron's orbit (ellipse), so that its plane coincides with the plane obtained
             // by rotating the x-y plane along the x, y and z axes (in this order).
             electronOrbit.rotation.set(rotateX, rotateY, rotateZ);
 
             this.electrons.add(electronOrbit);
-            this.electronsConfig[electron.uuid] = { a, b, theta, rotateX, rotateY, rotateZ };
-        }
+            this.electronsConfig[electronTrail.uuid] = {
+                a,
+                b,
+                theta,
+                rotateX,
+                rotateY,
+                rotateZ,
+                viewKey,
+            };
+        });
         this.atom.add(this.electrons);
 
         if (this.debug) {
             this.debugFolder.addColor(this.debugParams, "nucleusColor").onChange(() => {
                 this.nucleus.material.color.set(this.debugParams.nucleusColor);
             });
-            this.debugFolder.addColor(this.debugParams, "electronColor").onChange(() => {
-                this.electronSpheres.forEach((electron) => {
-                    electron.material.color.set(this.debugParams.electronColor);
-                });
-            });
+            // this.debugFolder.addColor(this.debugParams, "electronColor").onChange(() => {
+            //     this.electronSpheres.forEach((electron) => {
+            //         electron.material.color.set(this.debugParams.electronColor);
+            //     });
+            // });
         }
+        this.electronHighlighter = new THREE.Mesh(
+            new THREE.RingBufferGeometry(
+                this.nucleusRadius * this.electronNucleusSizeRatio + 0.04,
+                this.nucleusRadius * this.electronNucleusSizeRatio + 0.05,
+                32
+            ),
+            this.nucleus.material
+        );
 
         return this.atom;
     }
 
     setMouseRaycaster() {
-        this.raycaster = new THREE.Raycaster();
+        this.raycaster = this.interactiveControls.raycaster;
+        this.objectsToCheck = [];
         this.currentIntersect = null;
-
-        this.mouse = new THREE.Vector2();
-        document.addEventListener("mousemove", (event) => {
-            this.mouse.x = (event.clientX / this.sizes.width) * 2 - 1;
-            this.mouse.y = -(event.clientY / this.sizes.height) * 2 + 1;
-        });
     }
 
     setDebugEnvironment() {
         if (this.experience.config.debug) {
             const modelBoundingBox = new THREE.BoxHelper(this.modelView, 0xffff00);
             this.modelView.add(modelBoundingBox);
+        }
+    }
+
+    set() {
+        this.#addListeners();
+    }
+
+    #addListeners() {
+        this.handlerInteractiveUp = this.#onInteractiveUp.bind(this);
+
+        this.interactiveControls.addListener("interactive-up", this.handlerInteractiveUp);
+        this.interactiveControls.objectsToCheck.push(...this.objectsToCheck);
+        this.interactiveControls.enable();
+    }
+
+    clear() {
+        this.#removeListeners();
+        this.scene.remove(this.electronHighlighter);
+    }
+
+    #removeListeners() {
+        this.interactiveControls.removeListener("interactive-up", this.handlerInteractiveUp);
+
+        this.objectsToCheck.forEach((objToRemove) => {
+            const index = this.interactiveControls.objectsToCheck.findIndex(
+                (obj) => obj === objToRemove
+            );
+            this.interactiveControls.objectsToCheck.splice(index, 1);
+        });
+        this.interactiveControls.disable();
+    }
+
+    /**
+     * Checks for the electron that was clicked upon and emits a "change-view" signal with the
+     * appropriate view requested by the user.
+     */
+    #onInteractiveUp(e) {
+        if (this.currentIntersect !== null) {
+            const selectedElectronUuid = Object.keys(this.electronsConfig).find((uuid) => {
+                const electronTrail = this.electrons.getObjectByProperty("uuid", uuid);
+                return (
+                    electronTrail.getObjectByProperty("uuid", this.currentIntersect.object.uuid) !==
+                    undefined
+                );
+            });
+            this.emit("change-view", {
+                viewKey: this.electronsConfig[selectedElectronUuid].viewKey,
+            });
         }
     }
 
@@ -146,15 +217,69 @@ export default class AtomNavigator {
         // around the nucleus.
         this.updateMouseRaycaster();
 
+        // Handle electron revolution around the nucleus and mouse interaction.
+        this.updateElectrons();
+    }
+
+    /**
+     * Makes the electrons revolve around the nucleus, prevent any electron from revolving
+     * that is being hovered over, and show additional animations like a revolving electron's
+     * tail, highlighting a static electron, etc.
+     */
+    updateElectrons() {
+        this.scene.remove(this.electronHighlighter);
         // Make electron(s) revolve around the nucleus.
         Object.keys(this.electronsConfig).forEach((uuid) => {
-            if (this.currentIntersect !== null && this.currentIntersect.object.uuid === uuid)
-                return;
+            const electronTrail = this.electrons.getObjectByProperty("uuid", uuid);
+            // Specially handle the electron being hovered over.
+            if (
+                this.currentIntersect !== null &&
+                electronTrail.getObjectByProperty("uuid", this.currentIntersect.object.uuid) !==
+                    undefined
+            ) {
+                // Prevent the last introduced electron sphere from decaying, others decay faster than normal.
+                electronTrail.children.forEach((elec, idx) => {
+                    if (idx === electronTrail.children.length - 1) return;
+                    elec.scale.multiplyScalar(0.5);
+                    if ((elec.scale.x < 0.01, elec.scale.y < 0.01, elec.scale.z < 0.01)) {
+                        electronTrail.remove(elec);
+                    }
+                });
 
-            this.electronsConfig[uuid].theta += this.time.delta * 0.00005;
+                // Add a ring around the electron being hovered over to highlight it to the user.
+                if (electronTrail.children.length === 1) {
+                    this.electronHighlighter.position.setFromMatrixPosition(
+                        electronTrail.children[0].matrixWorld
+                    );
+                    this.electronHighlighter.scale.setFromMatrixScale(
+                        electronTrail.children[0].matrixWorld
+                    );
+                    this.scene.add(this.electronHighlighter);
+                }
+                return;
+            }
+            // Decrease the size of each sphere associated with an electron and
+            // remove those that would not be visible to the human eye.
+            electronTrail.children.forEach((elec) => {
+                elec.scale.multiplyScalar(0.95);
+                if ((elec.scale.x < 0.01, elec.scale.y < 0.01, elec.scale.z < 0.01)) {
+                    electronTrail.remove(elec);
+                }
+            });
+
+            // Add another sphere to the electron at the next position where the
+            // electron should visit while revolving around the nucleus.
+            this.electronsConfig[uuid].theta += this.time.delta * 0.00025;
             const position = compute3DEllipseCoordinates(this.electronsConfig[uuid]);
-            const electron = this.electrons.getObjectByProperty("uuid", uuid);
-            electron.position.set(position.x, position.y, position.z);
+            const electron = createSphere({
+                color: this.debugParams.electronColor,
+                x: position.x,
+                y: position.y,
+                z: position.z,
+                geometry: electronTrail.children[0].geometry,
+                material: electronTrail.children[0].material,
+            });
+            electronTrail.add(electron);
         });
     }
 
@@ -185,12 +310,15 @@ export default class AtomNavigator {
         );
     }
 
+    /**
+     * Check for any pointer-based events that might have occurred due to the intersection of
+     * mouse pointer with the electrons.
+     */
     updateMouseRaycaster() {
-        // Cast a ray from the mouse and handle events.
-        this.raycaster.setFromCamera(this.mouse, this.camera.instance);
-
-        const intersects = this.raycaster.intersectObjects(this.electronSpheres);
+        // Check if the pointer is intersecting with any electron. If it is, then stop and highlight it.
+        const intersects = this.raycaster.intersectObjects(this.objectsToCheck);
         if (intersects.length) {
+            // If an electron is already being hovered over, then don't overwrite it.
             if (this.currentIntersect === null) {
                 this.currentIntersect = intersects[0];
             }
@@ -198,6 +326,10 @@ export default class AtomNavigator {
             this.currentIntersect = null;
         }
     }
+
+    resize() {}
+
+    destroy() {}
 }
 
 /** Helpers **/
@@ -209,15 +341,20 @@ export default class AtomNavigator {
  * @param {float} _options.x - x-coordinate of the sphere (default: 0).
  * @param {float} _options.y - y-coordinate of the sphere (default: 0).
  * @param {float} _options.z - z-coordinate of the sphere (default: 0).
+ * @param {THREE.SphereBufferGeometry} geometry - geometry of which the sphere should be made up of (default: THREE.SphereBufferGeometry).
+ * @param {THREE.MeshBasicMaterial} material - material of which the sphere should be made up of (default: THREE.MeshBasicMaterial).
  * @returns {THREE.Mesh}
  */
 function createSphere(_options = {}) {
-    const geometry = new THREE.SphereBufferGeometry(_options.radius || 1.0, 64, 64);
-    const material = new THREE.MeshBasicMaterial({
-        color: _options.color || 0x68c3c0,
-        transparent: true,
-        opacity: 0.8,
-    });
+    const geometry =
+        _options.geometry || new THREE.SphereBufferGeometry(_options.radius || 1.0, 64, 64);
+    const material =
+        _options.material ||
+        new THREE.MeshBasicMaterial({
+            color: _options.color || 0x68c3c0,
+            transparent: true,
+            opacity: 0.8,
+        });
     const sphere = new THREE.Mesh(geometry, material);
 
     sphere.position.x = _options.x || 0;

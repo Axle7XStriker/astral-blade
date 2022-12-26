@@ -24,6 +24,10 @@ export default class InteractiveParticlesImage extends EventEmitter {
 
         this.visibilityThreshold = _options.visibilityThreshold || 34;
 
+        this.init(_options);
+    }
+
+    init(_options = {}) {
         // Debug GUI
         if (this.debug) {
             this.debugFolder = this.debug.addFolder("InteractiveParticlesImage");
@@ -53,8 +57,9 @@ export default class InteractiveParticlesImage extends EventEmitter {
 
                 this.setDebugEnvironment();
 
-                this.#addListeners();
+                // this.#addListeners();
 
+                this.finishInit = true;
                 this.trigger("finishInit");
             }
         });
@@ -178,12 +183,20 @@ export default class InteractiveParticlesImage extends EventEmitter {
         }
     }
 
+    set() {
+        this.#addListeners();
+    }
+
     #addListeners() {
-        this.handlerInteractiveMove = this.onInteractiveMove.bind(this);
+        this.handlerInteractiveMove = this.#onInteractiveMove.bind(this);
 
         this.interactiveControls.addListener("interactive-move", this.handlerInteractiveMove);
         this.interactiveControls.objectsToCheck.push(this.hitArea);
         this.interactiveControls.enable();
+    }
+
+    clear() {
+        this.#removeListeners();
     }
 
     #removeListeners() {
@@ -192,11 +205,11 @@ export default class InteractiveParticlesImage extends EventEmitter {
         const index = this.interactiveControls.objectsToCheck.findIndex(
             (obj) => obj === this.hitArea
         );
-        this.interactiveControls.objects.splice(index, 1);
+        this.interactiveControls.objectsToCheck.splice(index, 1);
         this.interactiveControls.disable();
     }
 
-    onInteractiveMove(e) {
+    #onInteractiveMove(e) {
         const uv = e.intersectionData.uv;
         if (this.touchTexture) this.touchTexture.addTouch(uv);
     }

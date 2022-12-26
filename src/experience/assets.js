@@ -13,6 +13,13 @@ export default [
         ],
     },
     {
+        name: "Back",
+        data: {},
+        items: [
+            { name: "backIndicator", source: "/assets/back-indicator.svg", type: "vector-graphic" },
+        ],
+    },
+    {
         name: "SelfPics",
         data: {},
         items: [{ name: "myFace", source: "/assets/ab_face.png", type: "texture" }],

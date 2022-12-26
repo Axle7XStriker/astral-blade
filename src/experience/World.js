@@ -25,6 +25,8 @@ export default class World {
         this.currentView = null;
         this.setupViews();
         this.setView("home");
+
+        this.#addListeners();
     }
 
     setDebugEnvironment() {
@@ -56,9 +58,9 @@ export default class World {
 
     setupViews() {
         this.views = {
-            home: new Home(),
             aboutMe: new AboutMe(),
         };
+        this.views["home"] = new Home({ numViews: Object.keys(this.views).length });
     }
 
     setView(viewType) {
@@ -67,12 +69,32 @@ export default class World {
             return;
         }
         if (this.currentViewType !== "") {
-            this.currentView.clearView();
+            this.currentView.clear();
+
+            const index = this.subjects.findIndex((obj) => obj === this.currentView);
+            this.subjects.splice(index, 1);
         }
         this.currentViewType = viewType;
         this.currentView = this.views[viewType];
         this.subjects.push(this.currentView);
-        this.currentView.setView();
+        this.currentView.set();
+
+        if (viewType !== "home") {
+            this.#includeBackIndicator();
+        }
+        console.log(this.subjects);
+    }
+
+    #includeBackIndicator() {
+        const backIndicator = document.querySelector("#back-indicator");
+        backIndicator.classList.remove("hide");
+        backIndicator.classList.add("show");
+        backIndicator.addEventListener("click", () => {
+            backIndicator.classList.remove("show");
+            backIndicator.classList.add("hide");
+
+            this.setView("home");
+        });
     }
 
     resize() {
@@ -89,6 +111,17 @@ export default class World {
                 obj.update();
             }
         });
+    }
+
+    #addListeners() {
+        this.handlerChangeView = this.onChangeView.bind(this);
+
+        this.views["home"].atomNavigator.addListener("change-view", this.handlerChangeView);
+    }
+
+    onChangeView(e) {
+        // console.log("Change View Called:", e);
+        this.setView(e.viewKey);
     }
 
     destroy() {}

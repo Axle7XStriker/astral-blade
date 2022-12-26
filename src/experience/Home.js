@@ -16,7 +16,10 @@ export default class Home {
         this.camera = this.experience.mainCamera;
         this.renderer = this.experience.renderer;
         this.sizes = this.experience.sizes;
+        this.init();
+    }
 
+    init() {
         // A collection of all the spawned subjects.
         this.subjects = [];
 
@@ -47,7 +50,6 @@ export default class Home {
     #setupAtomNavigator() {
         this.atomNavigator = new AtomNavigator({
             nucleusRadius: 1.0,
-            electronCount: 7,
             electronNucleusSizeRatio: 0.2,
         });
         // console.log(this.atomNavigator);
@@ -160,13 +162,16 @@ export default class Home {
         }
     }
 
-    setView() {
+    set() {
         const homeViewDom = document.querySelector("#home.view");
 
         // Make the HTML part of the view visible and start animating.
         homeViewDom.classList.remove("hide");
         homeViewDom.classList.add("show");
         this.#typedIndividualsTraits.start();
+
+        // Set all the subjects of the scene.
+        this.atomNavigator.set();
 
         // Add home view model to the scene.
         this.scene.add(this.modelView);
@@ -175,7 +180,7 @@ export default class Home {
         this.camera.focusCamera(this.modelView);
     }
 
-    clearView() {
+    clear() {
         const homeViewDom = document.querySelector("#home.view");
 
         // Make the HTML part of the view invisible and stop animating.
@@ -183,8 +188,11 @@ export default class Home {
         homeViewDom.classList.add("hide");
         this.#typedIndividualsTraits.stop();
 
-        // Add home view model to the scene.
+        // Remove home view model from the scene.
         this.scene.remove(this.modelView);
+
+        // Clear out all the subjects of the scene.
+        this.atomNavigator.clear();
     }
 
     resize() {

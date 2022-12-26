@@ -5,14 +5,17 @@ import InteractiveParticlesImage from "./InteractiveParticlesImage.js";
 import { fitObjectToBoundingBox } from "./utils/common.js";
 
 /** About-Me view of the experience. */
-export default class Home {
+export default class AboutMe {
     constructor(_options = {}) {
         this.experience = new Experience();
         this.scene = this.experience.scene;
         this.camera = this.experience.mainCamera;
         this.renderer = this.experience.renderer;
         this.sizes = this.experience.sizes;
+        this.init();
+    }
 
+    init() {
         // A collection of all the spawned subjects.
         this.subjects = [];
 
@@ -137,7 +140,7 @@ export default class Home {
         }
     }
 
-    setView() {
+    set() {
         const aboutMeViewDom = document.querySelector("#about-me.view");
 
         // Make the HTML part of the view visible and start animating.
@@ -147,13 +150,20 @@ export default class Home {
         // Add home view model to the scene.
         this.scene.add(this.modelView);
 
-        // Adjust camera to focus on the view.
-        this.interactiveParticleImage.on("finishInit", () => {
+        if (this.interactiveParticleImage.finishInit) {
+            // Adjust camera to focus on the view.
             this.camera.focusCamera(this.modelView);
-        });
+            this.interactiveParticleImage.set();
+        } else {
+            this.interactiveParticleImage.on("finishInit", () => {
+                // Adjust camera to focus on the view.
+                this.camera.focusCamera(this.modelView);
+                this.interactiveParticleImage.set();
+            });
+        }
     }
 
-    clearView() {
+    clear() {
         const aboutMeViewDom = document.querySelector("#about-me.view");
 
         // Make the HTML part of the view invisible and stop animating.
@@ -162,6 +172,9 @@ export default class Home {
 
         // Add home view model to the scene.
         this.scene.remove(this.modelView);
+
+        // Clear out all the subjects of the scene.
+        this.interactiveParticleImage.clear();
     }
 
     resize() {

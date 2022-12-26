@@ -3,6 +3,7 @@ import { mergeBufferGeometries } from "three/examples/jsm/utils/BufferGeometryUt
 import { SVGLoader } from "three/examples/jsm/loaders/SVGLoader";
 
 import Experience from "./Experience.js";
+import { convertShapePathsToBufferGeometry } from "./utils/common.js";
 
 /** A heads-up display (HUD) for displaying data that is independent of viewpoint. */
 export default class HUD {
@@ -84,22 +85,7 @@ export default class HUD {
 
         // Iterate through all the paths and their sub-paths to obtain their respective geometries.
         const paths = this.resources.items.hudBoundary.paths;
-        let subPathGeometries = [];
-        for (let i = 0; i < paths.length; i++) {
-            const path = paths[i];
-
-            for (let j = 0, jl = path.subPaths.length; j < jl; j++) {
-                const subPath = path.subPaths[j];
-                const subPathGeometry = SVGLoader.pointsToStroke(
-                    subPath.getPoints(),
-                    path.userData.style
-                );
-                if (subPathGeometry) {
-                    subPathGeometries.push(subPathGeometry);
-                }
-            }
-        }
-        const pathGeometry = mergeBufferGeometries(subPathGeometries, true);
+        const pathGeometry = convertShapePathsToBufferGeometry(paths);
 
         // Since the SVG is created on a grid where positive y-axis is downwards, and not in
         // Normalized Device Coordinates (NDC), below transformations fix that.

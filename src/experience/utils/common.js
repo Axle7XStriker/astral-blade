@@ -1,4 +1,6 @@
 import * as THREE from "three";
+import { mergeBufferGeometries } from "three/examples/jsm/utils/BufferGeometryUtils";
+import { SVGLoader } from "three/examples/jsm/loaders/SVGLoader";
 import { SimplexNoise } from "simplex-noise";
 
 const SIMPLEX_NOISE = new SimplexNoise();
@@ -54,10 +56,40 @@ export function modulateSphericalGeometry(mesh, bassFr, trebleFr) {
 }
 
 /**
+ * Convert an array of {ShapePath}(s) (possibly representing a SVG) into the corresponding
+ * three.js {BufferGeometry}.
+ * @param {Array} shapePaths - an array of {ShapePath}(s).
+ * @returns {BufferGeometry}
+ */
+export function convertShapePathsToBufferGeometry(shapePaths) {
+    let subPathGeometries = [];
+
+    // Iterate through all the {ShapePath}(s) and their sub-paths to obtain their respective {BufferGeometry}(s).
+    for (let i = 0; i < shapePaths.length; i++) {
+        const shapePath = shapePaths[i];
+
+        for (let j = 0, jl = shapePath.subPaths.length; j < jl; j++) {
+            const subPath = shapePath.subPaths[j];
+            const subPathGeometry = SVGLoader.pointsToStroke(
+                subPath.getPoints(),
+                shapePath.userData.style
+            );
+            if (subPathGeometry) {
+                subPathGeometries.push(subPathGeometry);
+            }
+        }
+    }
+
+    // Merge all the path {BufferGeometry}(s) obtained into one single {BufferGeometry}.
+    return mergeBufferGeometries(subPathGeometries, true);
+}
+
+/**
  * Fits an object inside a bounding box such that the object is placed at the center of the box
  * and occupies the maximum possible area inside the box.
  * @param {Object3D} object - an object to be fitted inside the bounding box.
  * @param {Box3} boundingBox - a bounding box in which the object is fitted.
+ * @returns {void}
  */
 export function fitObjectToBoundingBox(object, boundingBox) {
     if (!(object instanceof THREE.Object3D)) {
