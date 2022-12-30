@@ -206,7 +206,7 @@ export default class InteractiveParticlesImage extends EventEmitter {
             (obj) => obj === this.hitArea
         );
         this.interactiveControls.objectsToCheck.splice(index, 1);
-        this.interactiveControls.disable();
+        // this.interactiveControls.disable();
     }
 
     #onInteractiveMove(e) {

@@ -5,6 +5,7 @@ import Experience from "./Experience.js";
 import Home from "./Home.js";
 import HUD from "./HUD.js";
 import VirtualAssistant from "./VirtualAssistant.js";
+import Work from "./Work.js";
 
 /**
  * High-level logical component that encompass all the subjects inside the scene (seen/unseen).
@@ -59,6 +60,7 @@ export default class World {
     setupViews() {
         this.views = {
             aboutMe: new AboutMe(),
+            work: new Work(),
         };
         this.views["home"] = new Home({ numViews: Object.keys(this.views).length });
     }

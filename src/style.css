@@ -127,3 +127,109 @@ body {
     font-size: 1.3vw;
     position: relative;
 }
+
+#work {
+    overflow: hidden;
+    /* pointer-events: none; */
+}
+#work .view-text {
+    top: 20%;
+    left: 10%;
+    width: 45vw;
+    z-index: 100;
+    position: absolute;
+    text-align: left;
+}
+@media (orientation: portrait) {
+    #work .view-text {
+        top: 10%;
+        left: 27.5%;
+        text-align: center;
+    }
+}
+#work .view-text-header {
+    text-transform: uppercase;
+    font-size: 7vw;
+    font-weight: 100;
+    position: relative;
+}
+#work .view-text-subheader {
+    font-size: 2.2vw;
+    font-weight: bold;
+    position: relative;
+}
+#work .lottie {
+    position: absolute;
+    top: 15%;
+    left: 50%;
+    z-index: 50;
+    width: 40vw;
+    height: 35vh;
+}
+@media (orientation: portrait) {
+    #work .lottie {
+        top: 25%;
+        left: 30%;
+    }
+}
+#work .magic-wall {
+    position: absolute;
+    top: 65%;
+    left: 0%;
+    width: 100vw;
+    height: 30vh;
+    z-index: 75;
+}
+#work .magic-wall .splide__track {
+    width: 100%;
+    height: 100%;
+}
+#work .magic-wall .splide__arrows {
+    display: none;
+    opacity: 0;
+    pointer-events: none;
+}
+#work .magic-wall ul {
+    width: 100%;
+    height: 100%;
+    list-style: none;
+    display: flex;
+    display: -ms-flexbox;
+    display: -webkit-box;
+    flex-wrap: nowrap;
+}
+#work .magic-wall ul li {
+    width: 25%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+    display: list-item;
+}
+#work .magic-wall .magic-wall-item {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    transition: transform 0.5s, opacity 0.5s;
+    transition: transform 0.5s, opacity 0.5s, -webkit-transform 0.5s;
+}
+#work .magic-wall img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 110;
+}
+#work .magic-wall ul li:hover .magic-wall-item {
+    transform: scale(1.14);
+    -ms-transform: scale(1.14);
+    -webkit-transform: scale(1.14);
+}
+#work .magic-wall ul li a{
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%
+}

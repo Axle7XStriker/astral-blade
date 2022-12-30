@@ -183,7 +183,7 @@ export default class AtomNavigator extends EventEmitter {
             );
             this.interactiveControls.objectsToCheck.splice(index, 1);
         });
-        this.interactiveControls.disable();
+        // this.interactiveControls.disable();
     }
 
     /**
