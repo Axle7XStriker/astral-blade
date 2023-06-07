@@ -100,17 +100,13 @@ export default class Renderer {
         /**
          * Effect composer
          */
-        const RenderTargetClass =
-            this.config.pixelRatio >= 2
-                ? THREE.WebGLRenderTarget
-                : THREE.WebGLMultisampleRenderTarget;
-        // const RenderTargetClass = THREE.WebGLRenderTarget
-        this.renderTarget = new RenderTargetClass(this.config.width, this.config.height, {
+        this.renderTarget = new THREE.WebGLRenderTarget(this.config.width, this.config.height, {
             generateMipmaps: false,
             minFilter: THREE.LinearFilter,
             magFilter: THREE.LinearFilter,
             format: THREE.RGBFormat,
             encoding: THREE.sRGBEncoding,
+            samples: 2,
         });
         this.postProcess.composer = new EffectComposer(this.instance, this.renderTarget);
         this.postProcess.composer.setSize(this.config.width, this.config.height);

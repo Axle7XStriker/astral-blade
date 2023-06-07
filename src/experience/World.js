@@ -4,6 +4,8 @@ import AboutMe from "./AboutMe.js";
 import Experience from "./Experience.js";
 import Home from "./Home.js";
 import HUD from "./HUD.js";
+import Music from "./Music.js";
+import PhysicalFitness from "./PhysicalFitness.js";
 import VirtualAssistant from "./VirtualAssistant.js";
 import Work from "./Work.js";
 
@@ -25,7 +27,7 @@ export default class World {
         this.currentViewType = "";
         this.currentView = null;
         this.setupViews();
-        this.setView("home");
+        this.setView("physicalFitness");
 
         this.#addListeners();
     }
@@ -61,6 +63,8 @@ export default class World {
         this.views = {
             aboutMe: new AboutMe(),
             work: new Work(),
+            music: new Music(),
+            physicalFitness: new PhysicalFitness(),
         };
         this.views["home"] = new Home({ numViews: Object.keys(this.views).length });
     }
