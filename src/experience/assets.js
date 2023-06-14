@@ -24,4 +24,46 @@ export default [
         data: {},
         items: [{ name: "myFace", source: "/assets/ab_face.png", type: "texture" }],
     },
+    {
+        name: "MusicIllustrations",
+        data: {},
+        items: [
+            {
+                name: "listening",
+                source: "/assets/listening-happy-music-rafiki.svg",
+                type: "vector-graphic",
+            },
+            {
+                name: "singing",
+                source: "/assets/friends-singing-christmas-carol-amico.svg",
+                type: "vector-graphic",
+            },
+            {
+                name: "composing",
+                source: "/assets/compose-music-pana.svg",
+                type: "vector-graphic",
+            },
+        ],
+    },
+    {
+        name: "FitnessIllustrations",
+        data: {},
+        items: [
+            {
+                name: "jogging",
+                source: "/assets/jogging-rafiki.svg",
+                type: "vector-graphic",
+            },
+            {
+                name: "workout",
+                source: "/assets/workout-cuate.svg",
+                type: "vector-graphic",
+            },
+            {
+                name: "football",
+                source: "/assets/football-goal-bro.svg",
+                type: "vector-graphic",
+            },
+        ],
+    },
 ];

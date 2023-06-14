@@ -4,6 +4,8 @@ import AboutMe from "./AboutMe.js";
 import Experience from "./Experience.js";
 import Home from "./Home.js";
 import HUD from "./HUD.js";
+import Music from "./Music.js";
+import Fitness from "./Fitness.js";
 import VirtualAssistant from "./VirtualAssistant.js";
 import Work from "./Work.js";
 
@@ -61,6 +63,8 @@ export default class World {
         this.views = {
             aboutMe: new AboutMe(),
             work: new Work(),
+            music: new Music(),
+            fitness: new Fitness(),
         };
         this.views["home"] = new Home({ numViews: Object.keys(this.views).length });
     }
