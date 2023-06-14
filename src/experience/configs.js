@@ -3,7 +3,7 @@ const VIEWS = {
     aboutMe: {},
     work: {},
     music: {},
-    physicalFitness: {},
+    fitness: {},
 };
 
 export { VIEWS };

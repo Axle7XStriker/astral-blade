@@ -264,48 +264,12 @@ body {
     font-weight: bold;
     position: relative;
 }
-#music img {
-    position: absolute;
-    z-index: 0;
-    width: 55%;
-    height: 40%;
-}
-#music #music-listening {
-    top: 5%;
-    left: 50%;
-}
-#music #music-singing {
-    top: 50%;
-    left: 0%;
-}
-#music #music-composing {
-    top: 50%;
-    left: 50%;
-}
-@media (orientation: portrait) {
-    #music img {
-        width: 50%;
-        height: 30%;
-    }
-    #music #music-listening {
-        top: 10%;
-        left: 25%;
-    }
-    #music #music-singing {
-        top: 40%;
-        left: 25%;
-    }
-    #music #music-composing {
-        top: 70%;
-        left: 25%;
-    }
-}
 
-#physical-fitness {
+#fitness {
     overflow: hidden;
     pointer-events: none;
 }
-#physical-fitness .view-text {
+#fitness .view-text {
     top: 20%;
     left: 10%;
     width: 45vw;
@@ -314,19 +278,19 @@ body {
     text-align: left;
 }
 @media (orientation: portrait) {
-    #physical-fitness .view-text {
+    #fitness .view-text {
         top: 10%;
         left: 27.5%;
         text-align: center;
     }
 }
-#physical-fitness .view-text-header {
+#fitness .view-text-header {
     text-transform: uppercase;
     font-size: 7vw;
     font-weight: 100;
     position: relative;
 }
-#physical-fitness .view-text-subheader {
+#fitness .view-text-subheader {
     font-size: 2.2vw;
     font-weight: bold;
     position: relative;
