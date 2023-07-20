@@ -4,6 +4,7 @@ const VIEWS = {
     work: {},
     music: {},
     fitness: {},
+    fun: {},
 };
 
 export { VIEWS };

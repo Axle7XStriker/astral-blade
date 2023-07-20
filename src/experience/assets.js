@@ -66,4 +66,11 @@ export default [
             },
         ],
     },
+    {
+        name: "FunActivites",
+        data: {},
+        items: [
+            { name: "travelCar", source: "/assets/shelbygtr/scene.gltf", type: "3d-model" },
+        ],
+    }
 ];

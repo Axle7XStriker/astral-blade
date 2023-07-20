@@ -49,10 +49,9 @@ export default class Music {
                     this.resources.items.composing];
                 this.#setupIllustrations();
                 this.#arrangeSubjects();
+                // this.#setupDebugEnvironment();
             }
         });
-
-        // this.#setupDebugEnvironment();
     }
 
     #setupViewText() {
@@ -223,19 +222,21 @@ export default class Music {
             );
             // Each illustration has a specific position in the model view. 
             const illustrationsBoxPositions = [
-                [[-this.sizes.width / this.sizes.height, 0, -(this.sizes.width / this.sizes.height + 1)], 
-                [this.sizes.width / this.sizes.height, 1/2, this.sizes.width / this.sizes.height + 1]],
+                [[-this.sizes.width / this.sizes.height, 1/4, -(this.sizes.width / this.sizes.height + 1)], 
+                [this.sizes.width / this.sizes.height, 3/4, this.sizes.width / this.sizes.height + 1]],
                 [[-this.sizes.width / this.sizes.height, -1/2, -(this.sizes.width / this.sizes.height + 1)], 
                 [this.sizes.width / this.sizes.height, 0, this.sizes.width / this.sizes.height + 1]],
                 [[-this.sizes.width / this.sizes.height, -1, -(this.sizes.width / this.sizes.height + 1)], 
                 [this.sizes.width / this.sizes.height, -1/2, this.sizes.width / this.sizes.height + 1]]
             ]
             for (let i = 0; i < this.illustrationsData.length; i++) {
+                let [x0, y0, z0] = illustrationsBoxPositions[i][0];
+                let [x1, y1, z1] = illustrationsBoxPositions[i][1];
                 fitObjectToBoundingBox(
                     this.illustrationsData[i].three.model,
                     new THREE.Box3(
-                        new THREE.Vector3(illustrationsBoxPositions[i][0]),
-                        new THREE.Vector3(illustrationsBoxPositions[i][1])
+                        new THREE.Vector3(x0, y0, z0),
+                        new THREE.Vector3(x1, y1, z1)
                     )
                 );
                 this.illustrationsData[i].three.model.scale.y *= -1;
@@ -245,8 +246,11 @@ export default class Music {
 
     #setupDebugEnvironment() {
         if (this.experience.config.debug) {
-            const modelBoundingBox = new THREE.BoxHelper(this.modelView, 0xff0000);
-            this.modelView.add(modelBoundingBox);
+            for (let i = 0; i < this.illustrationsData.length; i++) {
+                console.log(this.illustrationsData[i].three.model);
+                const modelBoundingBox = new THREE.BoxHelper(this.illustrationsData[i].three.model, 0xff0000);
+                this.modelView.add(modelBoundingBox);
+            }
         }
     }
 

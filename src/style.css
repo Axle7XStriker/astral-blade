@@ -295,3 +295,34 @@ body {
     font-weight: bold;
     position: relative;
 }
+
+#fun {
+    overflow: hidden;
+    pointer-events: none;
+}
+#fun .view-text {
+    top: 20%;
+    left: 10%;
+    width: 45vw;
+    z-index: 100;
+    position: absolute;
+    text-align: left;
+}
+@media (orientation: portrait) {
+    #fun .view-text {
+        top: 10%;
+        left: 27.5%;
+        text-align: center;
+    }
+}
+#fun .view-text-header {
+    text-transform: uppercase;
+    font-size: 7vw;
+    font-weight: 100;
+    position: relative;
+}
+#fun .view-text-subheader {
+    font-size: 2.2vw;
+    font-weight: bold;
+    position: relative;
+}
