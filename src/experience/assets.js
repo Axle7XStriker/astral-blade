@@ -10,6 +10,7 @@ export default [
         data: {},
         items: [
             { name: "hudBoundary", source: "/assets/hud-boundary.svg", type: "vector-graphic" },
+            { name: "feedbackIcon", source: "/assets/feedback-icon.svg", type: "vector-graphic" },
         ],
     },
     {
