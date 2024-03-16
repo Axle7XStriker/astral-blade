@@ -326,3 +326,136 @@ body {
     font-weight: bold;
     position: relative;
 }
+
+#feedback {
+    overflow: hidden;
+    pointer-events: none;
+}
+#feedback .view-text {
+    top: 20%;
+    left: 10%;
+    width: 45vw;
+    z-index: 100;
+    position: absolute;
+    text-align: left;
+}
+@media (orientation: portrait) {
+    #feedback .view-text {
+        top: 10%;
+        left: 27.5%;
+        text-align: center;
+    }
+}
+#feedback .view-text-header {
+    text-transform: uppercase;
+    font-size: 7vw;
+    font-weight: 100;
+    position: relative;
+}
+#feedback .view-text-subheader {
+    font-size: 2.2vw;
+    font-weight: bold;
+    position: relative;
+}
+
+#feedback-form {
+    top: 40%;
+    left: 10%;
+    width: 30vw;
+    z-index: 100;
+    position: absolute;
+    text-align: left;
+    font-family: "futura-pt", sans-serif;
+    font-size: 1.5vw;
+    color: #68c3c0;
+    pointer-events: all;
+    border: 1px solid #68c3c0;
+    padding: 1vw;
+}
+@media (orientation: portrait) {
+    #feedback-form {
+        top: 20%;
+        left: 27.5%;
+        width: 50vw;
+        text-align: center;
+    }
+}
+
+#feedback-form label {
+    font-size: 2.5vh;
+    font-weight: bold;
+}
+
+#feedback-form input {
+    height: 2.5vh;
+    width: 90%;
+    border: 1px solid #00bebe;
+    padding: 0px 2%;
+    background: transparent;
+    color: white;
+    
+    &:hover {
+        border: 1px solid #00dcdc;
+    }
+    
+    &:focus {
+        border: 1px solid #00dcdc;
+        background: #00dcdc;
+        color: #212121;
+    }
+}
+
+#feedback-form textarea {
+    height: 7.5vh;
+    width: 90%;
+    border: 1px solid #00bebe;
+    padding: 0px 2%;
+    background: transparent;
+    color: white;
+    
+    &:hover {
+        border: 1px solid #00dcdc;
+    }
+    
+    &:focus {
+        border: 1px solid #00dcdc;
+        background: #00dcdc;
+        color: #212121;
+    }
+}
+
+#feedback-form button {
+    overflow: hidden;
+    position: relative;
+    height: 4vh;
+    width: 40%;
+    margin-top: 2%;
+    border: 1px solid #00bebe;
+    color:white;
+    background: rgba(0, 190, 190, .2);
+    
+    &:hover {
+        border: 1px solid #00dcdc;
+        color: #00dcdc;
+        background: rgba(0, 220, 220, .3);
+    }
+}
+
+#feedback-form button:disabled {
+    color: black;
+}
+
+#feedback-form .form-text {
+    font-size: 1.5vh;
+    float: right;
+    margin-right: 10%;
+}
+@media (orientation: portrait) {
+    #feedback-form .form-text {
+        margin-right: 5%;
+    }
+}
+
+#feedback-form .formio-errors .form-text{
+    float: none;
+}

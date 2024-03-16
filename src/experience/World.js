@@ -9,6 +9,7 @@ import Fitness from "./Fitness.js";
 import Fun from "./Fun.js";
 import VirtualAssistant from "./VirtualAssistant.js";
 import Work from "./Work.js";
+import Feedback from "./Feedback.js";
 
 /**
  * High-level logical component that encompass all the subjects inside the scene (seen/unseen).
@@ -58,6 +59,8 @@ export default class World {
 
         this.scene.add(this.hud.modelView);
         this.subjects.push(this.hud);
+
+        this.hud.set();
     }
 
     setupViews() {
@@ -67,6 +70,7 @@ export default class World {
             music: new Music(),
             fitness: new Fitness(),
             fun: new Fun(),
+            feedback: new Feedback(),
         };
         this.views["home"] = new Home({ numViews: Object.keys(this.views).length });
     }
@@ -100,6 +104,7 @@ export default class World {
         backIndicator.addEventListener("click", () => {
             backIndicator.classList.remove("show");
             backIndicator.classList.add("hide");
+            this.hud.addFeedbackIcon();
 
             this.setView("home");
         });
@@ -123,13 +128,21 @@ export default class World {
 
     #addListeners() {
         this.handlerChangeView = this.onChangeView.bind(this);
+        this.handlerOpenFeedback = this.onOpenFeedback.bind(this);
 
         this.views["home"].atomNavigator.addListener("change-view", this.handlerChangeView);
+        this.hud.addListener("open-feedback", this.handlerOpenFeedback);
     }
 
     onChangeView(e) {
         // console.log("Change View Called:", e);
         this.setView(e.viewKey);
+    }
+
+    onOpenFeedback(e) {
+        // console.log("Open Feedback Called:", e);
+        this.setView(e.viewKey);
+        this.hud.removeFeedbackIcon();
     }
 
     destroy() {}
