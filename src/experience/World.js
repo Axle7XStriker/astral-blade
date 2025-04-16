@@ -90,6 +90,10 @@ export default class World {
         this.currentView = this.views[viewType];
         this.subjects.push(this.currentView);
         this.currentView.set();
+        if (this.hud.hudBoundary) {
+            this.experience.mainCamera.focusCamera(this.hud.hudBoundary, 1);
+        }
+        
 
         if (viewType !== "home") {
             this.#includeBackIndicator();

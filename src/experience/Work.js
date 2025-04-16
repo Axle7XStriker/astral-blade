@@ -254,9 +254,6 @@ export default class Work {
 
         // Add home view model to the scene.
         this.scene.add(this.modelView);
-
-        // Adjust camera to focus on the view.
-        this.camera.focusCamera(this.modelView);
     }
 
     clear() {
@@ -286,9 +283,6 @@ export default class Work {
             1,
             this.sizes.width / this.sizes.height + 1
         );
-
-        // Adjust camera to focus on the view.
-        this.camera.focusCamera(this.modelView);
     }
 
     update() {
