@@ -151,13 +151,9 @@ export default class AboutMe {
         this.scene.add(this.modelView);
 
         if (this.interactiveParticleImage.finishInit) {
-            // Adjust camera to focus on the view.
-            this.camera.focusCamera(this.modelView);
             this.interactiveParticleImage.set();
         } else {
             this.interactiveParticleImage.on("finishInit", () => {
-                // Adjust camera to focus on the view.
-                this.camera.focusCamera(this.modelView);
                 this.interactiveParticleImage.set();
             });
         }
@@ -191,9 +187,6 @@ export default class AboutMe {
                 1,
                 this.sizes.width / this.sizes.height + 1
             );
-
-            // Adjust camera to focus on the view.
-            this.camera.focusCamera(this.modelView);
         }
     }
 

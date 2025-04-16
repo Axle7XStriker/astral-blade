@@ -78,11 +78,10 @@ export default class Camera {
      * other position of camera.
      * @param {THREE.Object3D} object - a three.js object.
      */
-    focusCamera(object) {
+    focusCamera(object, offset=1.25) {
         if (!(object instanceof THREE.Object3D)) {
             throw new Error("An object of type {THREE.Object3D} needs to be passed.");
         }
-        const offset = 1.25;
         const boundingBox = new THREE.Box3();
         boundingBox.setFromObject(object);
         const center = boundingBox.getCenter(new THREE.Vector3());

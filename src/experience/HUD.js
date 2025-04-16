@@ -14,6 +14,7 @@ export default class HUD extends EventEmitter {
         this.camera = this.experience.mainCamera;
         this.resources = this.experience.resources;
         this.interactiveControls = this.experience.interactiveControls;
+        this.sizes = this.experience.sizes;
 
         this.init();
     }
@@ -35,9 +36,13 @@ export default class HUD extends EventEmitter {
      */
     createHudOverlay() {
         // this.modelView.add(this.#createDisplayPlane());
-        this.modelView.add(this.#createHudBoundary());
+        this.hudBoundary = this.#createHudBoundary();
+        this.modelView.add(this.hudBoundary);
+
         this.feedbackIcon = this.#createFeedbackIcon();
         this.modelView.add(this.feedbackIcon);
+
+        this.camera.focusCamera(this.hudBoundary, 1);
 
         return this.hudOverlay;
     }
@@ -84,16 +89,6 @@ export default class HUD extends EventEmitter {
             depthWrite: false,
             // wireframe: true,
         });
-        // All HUD elements need to remain fixed in their specified position irrespective of camera position.
-        material.onBeforeCompile = function (shader) {
-            shader.vertexShader = shader.vertexShader.replace(
-                `#include <project_vertex>`,
-                `
-                    #include <project_vertex>
-                    gl_Position = vec4( transformed, 1.0 );
-                `
-            );
-        };
 
         // Iterate through all the paths and their sub-paths to obtain their respective geometries.
         const paths = this.resources.items.hudBoundary.paths;
@@ -111,7 +106,10 @@ export default class HUD extends EventEmitter {
         }
 
         const hudBoundary = new THREE.Mesh(pathGeometry, material);
-        // hudBoundary.position.set(0, 0, 1).unproject(this.camera.instance);
+
+        hudBoundary.geometry.scale(this.camera.instance.aspect, 1, 1);
+        this.currentScale = this.camera.instance.aspect;
+        hudBoundary.position.set(0, 0, 2.5);
 
         return hudBoundary;
     }
@@ -172,7 +170,11 @@ export default class HUD extends EventEmitter {
         this.objectsToCheck.push(planeMesh);
 
         // All HUD elements need to remain fixed in their specified position irrespective of camera position.
-        feedbackIcon.position.set(1.05, -0.75, 0).unproject(this.camera.instance);
+        feedbackIcon.position.set(
+            (this.sizes.width / this.sizes.height * 1.01), 
+            -0.8, 
+            2.5
+        );
 
         return feedbackIcon;
     }
@@ -284,6 +286,17 @@ export default class HUD extends EventEmitter {
     }
 
     resize() {
-        this.feedbackIcon.position.set(1.05, -0.75, 0).unproject(this.camera.instance);
+        this.hudBoundary.geometry.scale(this.camera.instance.aspect / this.currentScale, 1, 1);
+        this.currentScale = this.camera.instance.aspect;
+        this.hudBoundary.position.set(0, 0, 2.5);
+        this.camera.focusCamera(this.hudBoundary, 1);
+
+        if (this.feedbackIcon) {
+            this.feedbackIcon.position.set(
+                (this.sizes.width / this.sizes.height * 1.01), 
+                -0.8, 
+                2.5
+            );
+        }
     }
 }
