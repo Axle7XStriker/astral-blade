@@ -89,6 +89,7 @@ export default class World {
         this.currentViewType = viewType;
         this.currentView = this.views[viewType];
         this.subjects.push(this.currentView);
+        this.currentView.resize();
         this.currentView.set();
         if (this.hud.hudBoundary) {
             this.experience.mainCamera.focusCamera(this.hud.hudBoundary, 1);
@@ -103,15 +104,22 @@ export default class World {
 
     #includeBackIndicator() {
         const backIndicator = document.querySelector("#back-indicator");
+        if (backIndicator.classList.contains("show")) {
+            return;
+        }
         backIndicator.classList.remove("hide");
         backIndicator.classList.add("show");
-        backIndicator.addEventListener("click", () => {
-            backIndicator.classList.remove("show");
-            backIndicator.classList.add("hide");
-            this.hud.addFeedbackIcon();
+        backIndicator.addEventListener(
+            "click", 
+            () => {
+                backIndicator.classList.remove("show");
+                backIndicator.classList.add("hide");
+                this.hud.addFeedbackIcon();
 
-            this.setView("home");
-        });
+                this.setView("home");
+            }, 
+            { once: true }
+        );
     }
 
     resize() {

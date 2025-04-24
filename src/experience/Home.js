@@ -76,7 +76,7 @@ export default class Home {
         this.#typedIndividualsTraits = new Typed("#home .typed-element", {
             stringsElement: "#home .typed-strings",
             typeSpeed: 100,
-            backDelay: 2100,
+            backDelay: 700,
             backSpeed: 100,
             loop: true,
             cursorChar: "█",
