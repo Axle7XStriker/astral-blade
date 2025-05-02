@@ -42,6 +42,8 @@ export default class HUD extends EventEmitter {
         this.feedbackIcon = this.#createFeedbackIcon();
         this.modelView.add(this.feedbackIcon);
 
+        this.backIndicator = this.#createBackIndicator();
+
         this.camera.focusCamera(this.hudBoundary, 1);
 
         return this.hudOverlay;
@@ -121,8 +123,7 @@ export default class HUD extends EventEmitter {
         const innerIconBoundaryGeometry = new THREE.EdgesGeometry(planeGeometry);
         planeGeometry.applyMatrix4(new THREE.Matrix4().makeScale(1.05, 1.15, 1));
         const outerIconBoundaryGeometry = new THREE.EdgesGeometry(planeGeometry);
-
-        const iconBoundaryMaterial = new THREE.LineBasicMaterial({ color: 0x67c7eb });
+        const iconBoundaryMaterial = new THREE.LineBasicMaterial({ color: 0x003144 });
         const innerIconBoundary = new THREE.LineSegments(
             innerIconBoundaryGeometry,
             iconBoundaryMaterial
@@ -155,16 +156,17 @@ export default class HUD extends EventEmitter {
             depthWrite: false,
             // wireframe: true,
         });
+        const feedbackIconSvg = new THREE.Mesh(pathGeometry, material);
+        feedbackIcon.add(feedbackIconSvg);
+
         const mat = new THREE.MeshBasicMaterial({
-            color: new THREE.Color(0x67c7eb).convertSRGBToLinear(),
+            color: new THREE.Color(0x003144).convertSRGBToLinear(),
             opacity: 0.0,
             transparent: true,
             side: THREE.DoubleSide,
             depthWrite: false,
             // wireframe: true,
         });
-        const feedbackIconSvg = new THREE.Mesh(pathGeometry, material);
-        feedbackIcon.add(feedbackIconSvg);
         const planeMesh = new THREE.Mesh(planeGeometry, mat);
         feedbackIcon.add(planeMesh);
         this.objectsToCheck.push(planeMesh);
@@ -177,6 +179,67 @@ export default class HUD extends EventEmitter {
         );
 
         return feedbackIcon;
+    }
+
+    #createBackIndicator() {
+        const backIndicator = new THREE.Group();
+
+        const paths = this.resources.items.backIndicator.paths;
+        const pathGeometry = convertShapePathsToBufferGeometry(paths);
+        // Since the SVG is created on a grid where positive y-axis is downwards, and not in
+        // Normalized Device Coordinates (NDC), below transformations fix that and put it at the
+        // appropriate place.
+        pathGeometry.computeBoundingBox();
+        let boundingBox = pathGeometry.boundingBox;
+        let center = boundingBox.getCenter(new THREE.Vector3());
+        let size = boundingBox.getSize(new THREE.Vector3());
+        const positions = pathGeometry.getAttribute("position").array;
+        for (let i = 0; i < positions.length; i += 3) {
+            positions[i] = (((positions[i] - boundingBox.min.x) * 0.1) / size.x + 0.05);
+            positions[i + 1] = -(((positions[i + 1] - boundingBox.min.y) * 0.1) / size.y - 0.05);
+        }
+        const material = new THREE.MeshBasicMaterial({
+            color: new THREE.Color(0x003144).convertSRGBToLinear(),
+            opacity: 0.5,
+            transparent: true,
+            side: THREE.DoubleSide,
+            depthWrite: false,
+        });
+        const backIndicatorSvg = new THREE.Mesh(pathGeometry, material);
+        backIndicator.add(backIndicatorSvg);
+
+        const planeGeometry = new THREE.PlaneGeometry(0.1, 0.1);
+        const mat = new THREE.MeshBasicMaterial({
+            color: new THREE.Color(0x003144).convertSRGBToLinear(),
+            opacity: 0.0,
+            transparent: true,
+            side: THREE.DoubleSide,
+            depthWrite: false,
+            // wireframe: true,
+        });
+        const planeMesh = new THREE.Mesh(planeGeometry, mat);
+        center.x = (((center.x - boundingBox.min.x) * 0.1) / size.x + 0.05);
+        center.y = -(((center.y - boundingBox.min.y) * 0.1) / size.y - 0.05);
+        planeMesh.position.set(center.x, center.y, center.z);
+        backIndicator.add(planeMesh);
+        this.objectsToCheck.push(planeMesh);
+
+        // All HUD elements need to remain fixed in their specified position irrespective of camera position.
+        if (this.sizes.width >= this.sizes.height) {
+            backIndicator.position.set(
+                (this.sizes.width / this.sizes.height * 0.85), 
+                0.8, 
+                2.5
+            );
+        } else {
+            backIndicator.position.set(
+                (this.sizes.width / this.sizes.height * 0.65), 
+                0.8, 
+                2.5
+            );
+        }
+
+        return backIndicator;
     }
 
     setMouseRaycaster() {
@@ -193,7 +256,6 @@ export default class HUD extends EventEmitter {
         this.handlerInteractiveUp = this.#onInteractiveUp.bind(this);
 
         this.interactiveControls.addListener("interactive-up", this.handlerInteractiveUp);
-        // this.interactiveControls.objectsToCheck.push(...this.objectsToCheck);
         this.interactiveControls.enable();
     }
 
@@ -202,11 +264,27 @@ export default class HUD extends EventEmitter {
     }
 
     addFeedbackIcon() {
-        this.modelView.add(this.feedbackIcon);
+        if (this.feedbackIcon) {
+            this.modelView.add(this.feedbackIcon);
+        }
     }
 
     removeFeedbackIcon() {
-        this.modelView.remove(this.feedbackIcon);
+        if (this.feedbackIcon) {
+            this.modelView.remove(this.feedbackIcon);
+        }
+    }
+
+    addBackIndicator() {
+        if (this.backIndicator) {
+            this.modelView.add(this.backIndicator);
+        }
+    }
+
+    removeBackIndicator() {
+        if (this.backIndicator) {
+            this.modelView.remove(this.backIndicator);
+        }
     }
 
     #removeListeners() {
@@ -222,8 +300,7 @@ export default class HUD extends EventEmitter {
     }
 
     /**
-     * Checks for the electron that was clicked upon and emits a "change-view" signal with the
-     * appropriate view requested by the user.
+     * Checks if a hud element was clicked upon and emits the appropriate event.
      */
     #onInteractiveUp(e) {
         if (
@@ -231,9 +308,22 @@ export default class HUD extends EventEmitter {
             this.feedbackIcon.getObjectByProperty("uuid", this.currentIntersect.object.uuid) !==
                 undefined
         ) {
+            // Checks if the feedback icon was clicked upon and emits an "open-feedback" signal with the
+            // "feedback" as the view key.
             console.log("open-feedback");
             this.emit("open-feedback", {
                 viewKey: "feedback",
+            });
+        } else if (
+            this.currentIntersect !== null &&
+            this.backIndicator.getObjectByProperty("uuid", this.currentIntersect.object.uuid) !==
+                undefined
+        ) {
+            // Checks if the back indicator icon was clicked upon and emits a "change-view" 
+            // signal with the "home" as the view key.
+            this.removeBackIndicator();
+            this.emit("change-view", {
+                viewKey: "home",
             });
         }
     }
@@ -247,6 +337,8 @@ export default class HUD extends EventEmitter {
         this.updateMouseRaycaster();
 
         this.updateFeedbackIcon();
+
+        this.updateBackIndicator();
     }
 
     /**
@@ -275,12 +367,27 @@ export default class HUD extends EventEmitter {
                     undefined
             ) {
                 this.feedbackIcon.children[0].children.forEach((child, idx) => {
-                    child.material.color.setHex(0x003144);
+                    child.material.color.setHex(0x67c7eb);
                 });
             } else {
                 this.feedbackIcon.children[0].children.forEach((child, idx) => {
-                    child.material.color.setHex(0x67c7eb);
+                    child.material.color.setHex(0x003144);
                 });
+            }
+        }
+    }
+
+    updateBackIndicator() {
+        if (this.backIndicator) {
+            // Update feedback icon's boundary when hovered upon
+            if (
+                this.currentIntersect !== null &&
+                this.backIndicator.getObjectByProperty("uuid", this.currentIntersect.object.uuid) !==
+                    undefined
+            ) {
+                this.backIndicator.children[0].material.color.setHex(0x67c7eb);
+            } else {
+                this.backIndicator.children[0].material.color.setHex(0x003144);
             }
         }
     }
@@ -297,6 +404,21 @@ export default class HUD extends EventEmitter {
                 -0.8, 
                 2.5
             );
+        }
+        if (this.backIndicator) {
+            if (this.sizes.width >= this.sizes.height) {
+                this.backIndicator.position.set(
+                    (this.sizes.width / this.sizes.height * 0.85), 
+                    0.8, 
+                    2.5
+                );
+            } else {
+                this.backIndicator.position.set(
+                    (this.sizes.width / this.sizes.height * 0.65), 
+                    0.8, 
+                    2.5
+                );
+            }
         }
     }
 }
