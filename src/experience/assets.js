@@ -11,12 +11,6 @@ export default [
         items: [
             { name: "hudBoundary", source: "/assets/hud-boundary.svg", type: "vector-graphic" },
             { name: "feedbackIcon", source: "/assets/feedback-icon.svg", type: "vector-graphic" },
-        ],
-    },
-    {
-        name: "Back",
-        data: {},
-        items: [
             { name: "backIndicator", source: "/assets/back-indicator.svg", type: "vector-graphic" },
         ],
     },

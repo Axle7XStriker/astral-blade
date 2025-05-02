@@ -97,29 +97,12 @@ export default class World {
         
 
         if (viewType !== "home") {
-            this.#includeBackIndicator();
+            this.hud.addBackIndicator();
+        }
+        if (viewType !== "feedback") {
+            this.hud.addFeedbackIcon();
         }
         console.log(this.subjects);
-    }
-
-    #includeBackIndicator() {
-        const backIndicator = document.querySelector("#back-indicator");
-        if (backIndicator.classList.contains("show")) {
-            return;
-        }
-        backIndicator.classList.remove("hide");
-        backIndicator.classList.add("show");
-        backIndicator.addEventListener(
-            "click", 
-            () => {
-                backIndicator.classList.remove("show");
-                backIndicator.classList.add("hide");
-                this.hud.addFeedbackIcon();
-
-                this.setView("home");
-            }, 
-            { once: true }
-        );
     }
 
     resize() {
@@ -144,6 +127,7 @@ export default class World {
 
         this.views["home"].atomNavigator.addListener("change-view", this.handlerChangeView);
         this.hud.addListener("open-feedback", this.handlerOpenFeedback);
+        this.hud.addListener("change-view", this.handlerChangeView);
     }
 
     onChangeView(e) {
