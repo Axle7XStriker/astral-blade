@@ -189,6 +189,7 @@ export default class InteractiveControls extends EventEmitter {
      * mouse click up event.
      */
     #onUp(e) {
+        if (!this.isDown) return;
         this.isDown = false;
 
         this.emit("interactive-up", { object: this.hovered });

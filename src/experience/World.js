@@ -10,6 +10,7 @@ import Fun from "./Fun.js";
 import VirtualAssistant from "./VirtualAssistant.js";
 import Work from "./Work.js";
 import Feedback from "./Feedback.js";
+import { VIEWS } from "./configs.js";
 
 /**
  * High-level logical component that encompass all the subjects inside the scene (seen/unseen).
@@ -114,6 +115,7 @@ export default class World {
     }
 
     update() {
+        this.hud.updateHudFooterText("");
         this.subjects.forEach((obj) => {
             if (typeof obj.update === "function") {
                 obj.update();
@@ -123,9 +125,11 @@ export default class World {
 
     #addListeners() {
         this.handlerChangeView = this.onChangeView.bind(this);
+        this.handlerElectronHovered = this.onElectronHovered.bind(this);
         this.handlerOpenFeedback = this.onOpenFeedback.bind(this);
 
         this.views["home"].atomNavigator.addListener("change-view", this.handlerChangeView);
+        this.views["home"].atomNavigator.addListener("electron-hovered", this.handlerElectronHovered);
         this.hud.addListener("open-feedback", this.handlerOpenFeedback);
         this.hud.addListener("change-view", this.handlerChangeView);
     }
@@ -133,6 +137,14 @@ export default class World {
     onChangeView(e) {
         // console.log("Change View Called:", e);
         this.setView(e.viewKey);
+    }
+
+    onElectronHovered(e) {
+        if (e === undefined || e.viewKey === undefined || !(e.viewKey in VIEWS)) {
+            this.hud.updateHudFooterText("");
+            return;
+        }
+        this.hud.updateHudFooterText( VIEWS[e.viewKey].footerText );
     }
 
     onOpenFeedback(e) {

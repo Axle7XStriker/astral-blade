@@ -242,6 +242,13 @@ export default class HUD extends EventEmitter {
         return backIndicator;
     }
 
+    updateHudFooterText(text) {
+        const hudFooterTextElement = document.getElementById("hud-footer-text");
+        if (hudFooterTextElement) {
+            hudFooterTextElement.textContent = text;
+        }
+    }
+
     setMouseRaycaster() {
         this.raycaster = this.interactiveControls.raycaster;
         this.objectsToCheck = [];
@@ -359,7 +366,7 @@ export default class HUD extends EventEmitter {
     }
 
     updateFeedbackIcon() {
-        if (this.feedbackIcon) {
+        if (this.feedbackIcon && this.modelView.getObjectByProperty("uuid", this.feedbackIcon.uuid) !== undefined) {
             // Update feedback icon's boundary when hovered upon
             if (
                 this.currentIntersect !== null &&
@@ -369,6 +376,7 @@ export default class HUD extends EventEmitter {
                 this.feedbackIcon.children[0].children.forEach((child, idx) => {
                     child.material.color.setHex(0x67c7eb);
                 });
+                this.updateHudFooterText("Click to provide feedback");
             } else {
                 this.feedbackIcon.children[0].children.forEach((child, idx) => {
                     child.material.color.setHex(0x003144);
@@ -378,7 +386,7 @@ export default class HUD extends EventEmitter {
     }
 
     updateBackIndicator() {
-        if (this.backIndicator) {
+        if (this.backIndicator && this.modelView.getObjectByProperty("uuid", this.backIndicator.uuid) !== undefined) {
             // Update feedback icon's boundary when hovered upon
             if (
                 this.currentIntersect !== null &&
@@ -386,6 +394,7 @@ export default class HUD extends EventEmitter {
                     undefined
             ) {
                 this.backIndicator.children[0].material.color.setHex(0x67c7eb);
+                this.updateHudFooterText("Click to go back to Home screen");
             } else {
                 this.backIndicator.children[0].material.color.setHex(0x003144);
             }
