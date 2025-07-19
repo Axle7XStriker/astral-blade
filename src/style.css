@@ -16,29 +16,6 @@ body {
     height: 100vh;
 }
 
-#back-indicator {
-    width: 10vw;
-    height: 10vh;
-    position: absolute;
-    top: 10vh;
-    left: 90vw;
-    z-index: 0;
-    opacity: 0;
-}
-@media (orientation: portrait) {
-    #back-indicator {
-        top: 5vh;
-        left: 85vw;
-    }
-}
-#back-indicator.show {
-    z-index: 100;
-    opacity: 1;
-}
-#back-indicator.hide {
-    display: none;
-}
-
 .view {
     width: 100vw;
     height: 80vh;
@@ -60,6 +37,26 @@ body {
 .view-text {
     font-size: 1vw;
     color: #68c3c0;
+}
+
+#hud {
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+    z-index: 200;
+    background: none;
+    pointer-events: none;
+}
+#hud-footer-text {
+    top: 93%;
+    width: 100%;
+    position: absolute;
+    text-align: center;
+}
+@media (orientation: portrait) {
+    #hud-footer-text {
+        font-size: 2vw;
+    }
 }
 
 #home {
@@ -148,9 +145,11 @@ body {
 #work {
     overflow: hidden;
     /* pointer-events: none; */
+    top: 15vh;
+    height: 70vh;
 }
 #work .view-text {
-    top: 20%;
+    top: 15%;
     left: 10%;
     width: 45vw;
     z-index: 100;
@@ -185,7 +184,7 @@ body {
 
 #work .lottie {
     position: absolute;
-    top: 15%;
+    top: 10%;
     left: 50%;
     z-index: 50;
     width: 40vw;
@@ -263,7 +262,7 @@ body {
 
 #music {
     overflow: hidden;
-    /* pointer-events: none; */
+    pointer-events: none;
 }
 #music .view-text {
     top: 20%;

@@ -91,7 +91,7 @@ export default class AtomNavigator extends EventEmitter {
             });
             const electron = createSphere({
                 radius: this.nucleusRadius * this.electronNucleusSizeRatio,
-                color: this.debugParams.electronColor,
+                color: VIEWS[viewKey].color,
                 x: position.x,
                 y: position.y,
                 z: position.z,
@@ -255,6 +255,9 @@ export default class AtomNavigator extends EventEmitter {
                         electronTrail.children[0].matrixWorld
                     );
                     this.scene.add(this.electronHighlighter);
+                    this.emit("electron-hovered", {
+                        viewKey: this.electronsConfig[uuid].viewKey,
+                    });
                 }
                 return;
             }
