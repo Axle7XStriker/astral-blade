@@ -1,0 +1,88 @@
+/*!
+ * 
+ *   typed.js - A JavaScript Typing Animation Library
+ *   Author: Matt Boldt <me@mattboldt.com>
+ *   Version: v2.0.12
+ *   Url: https://github.com/mattboldt/typed.js
+ *   License(s): MIT
+ * 
+ */
+
+/*!
+ * Signature Pad v4.1.7 | https://github.com/szimek/signature_pad
+ * (c) 2023 Szymon Nowak | Released under the MIT license
+ */
+
+/*!
+ * Splide.js
+ * Version  : 4.1.4
+ * License  : MIT
+ * Copyright: 2022 Naotoshi Fujita
+ */
+
+/*!
+ * https://github.com/Starcounter-Jack/JSON-Patch
+ * (c) 2017-2021 Joachim Wester
+ * MIT license
+ */
+
+/*!
+ * https://github.com/Starcounter-Jack/JSON-Patch
+ * (c) 2017-2022 Joachim Wester
+ * MIT licensed
+ */
+
+/*!
+fflate - fast JavaScript compression/decompression
+<https://101arrowz.github.io/fflate>
+Licensed under MIT. https://github.com/101arrowz/fflate/blob/master/LICENSE
+version 0.6.9
+*/
+
+/*! @formio/choices.js v10.2.0 | © 2023 Josh Johnson | https://github.com/jshjohnson/Choices#readme */
+
+/*! @license DOMPurify 3.0.8 | (c) Cure53 and other contributors | Released under the Apache license 2.0 and Mozilla Public License 2.0 | github.com/cure53/DOMPurify/blob/3.0.8/LICENSE */
+
+/*! Native Promise Only
+    v0.8.1 (c) Kyle Simpson
+    MIT License: http://getify.mit-license.org
+*/
+
+/*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */
+
+/**
+ * @license
+ * Copyright 2010-2021 Three.js Authors
+ * SPDX-License-Identifier: MIT
+ */
+
+/**
+ * @license
+ * Lodash <https://lodash.com/>
+ * Copyright OpenJS Foundation and other contributors <https://openjsf.org/>
+ * Released under MIT license <https://lodash.com/license>
+ * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
+ * Copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+ */
+
+/**
+ * lil-gui
+ * https://lil-gui.georgealways.com
+ * @version 0.12.0
+ * @author George Michael Brower
+ * @license MIT
+ */
+
+//! Copyright (c) JS Foundation and other contributors
+
+//! github.com/moment/moment-timezone
+
+//! license : MIT
+
+//! moment-timezone.js
+
+//! moment.js
+
+//! moment.js locale configuration
+
+//! version : 0.5.44

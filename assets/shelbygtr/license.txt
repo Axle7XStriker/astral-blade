@@ -1,0 +1,11 @@
+Model Information:
+* title:	ShelbyGTR [Free]
+* source:	https://sketchfab.com/3d-models/shelbygtr-free-f6d54e8e5a8b4bda80145e2828229cbd
+* author:	CarEnthusiast (https://sketchfab.com/CarEnthusiast)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "ShelbyGTR [Free]" (https://sketchfab.com/3d-models/shelbygtr-free-f6d54e8e5a8b4bda80145e2828229cbd) by CarEnthusiast (https://sketchfab.com/CarEnthusiast) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
