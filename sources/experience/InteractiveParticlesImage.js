@@ -190,7 +190,7 @@ export default class InteractiveParticlesImage extends EventEmitter {
     #addListeners() {
         this.handlerInteractiveMove = this.#onInteractiveMove.bind(this);
 
-        this.interactiveControls.addListener("interactive-move", this.handlerInteractiveMove);
+        this.interactiveControls.addEventListener("interactive-move", this.handlerInteractiveMove);
         this.interactiveControls.objectsToCheck.push(this.hitArea);
         this.interactiveControls.enable();
     }
@@ -200,7 +200,7 @@ export default class InteractiveParticlesImage extends EventEmitter {
     }
 
     #removeListeners() {
-        this.interactiveControls.removeListener("interactive-move", this.handlerInteractiveMove);
+        this.interactiveControls.removeEventListener("interactive-move", this.handlerInteractiveMove);
 
         const index = this.interactiveControls.objectsToCheck.findIndex(
             (obj) => obj === this.hitArea

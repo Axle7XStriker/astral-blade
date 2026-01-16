@@ -1,13 +1,10 @@
-import EventEmitter from "events";
 import * as THREE from "three";
-import { mergeBufferGeometries } from "three/examples/jsm/utils/BufferGeometryUtils";
-import { SVGLoader } from "three/examples/jsm/loaders/SVGLoader";
 
 import Experience from "./Experience.js";
 import { convertShapePathsToBufferGeometry } from "./utils/common.js";
 
 /** A heads-up display (HUD) for displaying data that is independent of viewpoint. */
-export default class HUD extends EventEmitter {
+export default class HUD extends THREE.EventDispatcher {
     constructor(_options = {}) {
         super();
         this.experience = new Experience();
@@ -262,7 +259,7 @@ export default class HUD extends EventEmitter {
     #addListeners() {
         this.handlerInteractiveUp = this.#onInteractiveUp.bind(this);
 
-        this.interactiveControls.addListener("interactive-up", this.handlerInteractiveUp);
+        this.interactiveControls.addEventListener("interactive-up", this.handlerInteractiveUp);
         this.interactiveControls.enable();
     }
 
@@ -295,7 +292,7 @@ export default class HUD extends EventEmitter {
     }
 
     #removeListeners() {
-        this.interactiveControls.removeListener("interactive-up", this.handlerInteractiveUp);
+        this.interactiveControls.removeEventListener("interactive-up", this.handlerInteractiveUp);
 
         this.objectsToCheck.forEach((objToRemove) => {
             const index = this.interactiveControls.objectsToCheck.findIndex(
@@ -318,7 +315,8 @@ export default class HUD extends EventEmitter {
             // Checks if the feedback icon was clicked upon and emits an "open-feedback" signal with the
             // "feedback" as the view key.
             console.log("open-feedback");
-            this.emit("open-feedback", {
+            this.dispatchEvent({
+                type: "open-feedback", 
                 viewKey: "feedback",
             });
         } else if (
@@ -329,7 +327,8 @@ export default class HUD extends EventEmitter {
             // Checks if the back indicator icon was clicked upon and emits a "change-view" 
             // signal with the "home" as the view key.
             this.removeBackIndicator();
-            this.emit("change-view", {
+            this.dispatchEvent({
+                type: "change-view",
                 viewKey: "home",
             });
         }

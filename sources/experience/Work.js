@@ -92,7 +92,7 @@ export default class Work {
             renderer: "svg",
             loop: true,
             autoplay: true,
-            path: "assets/laboratory.json", // the path to the animation json
+            path: import.meta.env.BASE_URL + "assets/laboratory.json", // the path to the animation json
         });
     }
 

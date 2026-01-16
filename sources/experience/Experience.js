@@ -137,7 +137,7 @@ export default class Experience {
         //     "click",
         //     () => {
         //         console.log("Audio added.");
-        //         this.audioManager.setupAudio("/assets/preview-3a.mp3");
+        //         this.audioManager.setupAudio(import.meta.env.BASE_URL + "/assets/preview-3a.mp3");
         //     },
         //     { once: true }
         // );

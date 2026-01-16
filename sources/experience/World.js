@@ -128,10 +128,10 @@ export default class World {
         this.handlerElectronHovered = this.onElectronHovered.bind(this);
         this.handlerOpenFeedback = this.onOpenFeedback.bind(this);
 
-        this.views["home"].atomNavigator.addListener("change-view", this.handlerChangeView);
-        this.views["home"].atomNavigator.addListener("electron-hovered", this.handlerElectronHovered);
-        this.hud.addListener("open-feedback", this.handlerOpenFeedback);
-        this.hud.addListener("change-view", this.handlerChangeView);
+        this.views["home"].atomNavigator.addEventListener("change-view", this.handlerChangeView);
+        this.views["home"].atomNavigator.addEventListener("electron-hovered", this.handlerElectronHovered);
+        this.hud.addEventListener("open-feedback", this.handlerOpenFeedback);
+        this.hud.addEventListener("change-view", this.handlerChangeView);
     }
 
     onChangeView(e) {

@@ -1,4 +1,3 @@
-import EventEmitter from "events";
 import * as THREE from "three";
 
 import Experience from "./Experience.js";
@@ -6,7 +5,7 @@ import { VIEWS } from "./configs.js";
 import { max, avg, modulate, modulateSphericalGeometry } from "./utils/common.js";
 
 /** A navigator in the form of an atom that can be used to view different aspects of the experience. */
-export default class AtomNavigator extends EventEmitter {
+export default class AtomNavigator extends THREE.EventDispatcher {
     /**
      * @param {float} _options.nucleusRadius - radius of the atom's nucleus (default: 1.0).
      * @param {float} _options.electronNucleusSizeRatio - ratio of the radius of electron to the radius of nucleus (default: 0.2).
@@ -164,7 +163,7 @@ export default class AtomNavigator extends EventEmitter {
     #addListeners() {
         this.handlerInteractiveUp = this.#onInteractiveUp.bind(this);
 
-        this.interactiveControls.addListener("interactive-up", this.handlerInteractiveUp);
+        this.interactiveControls.addEventListener("interactive-up", this.handlerInteractiveUp);
         this.interactiveControls.objectsToCheck.push(...this.objectsToCheck);
         this.interactiveControls.enable();
     }
@@ -175,7 +174,7 @@ export default class AtomNavigator extends EventEmitter {
     }
 
     #removeListeners() {
-        this.interactiveControls.removeListener("interactive-up", this.handlerInteractiveUp);
+        this.interactiveControls.removeEventListener("interactive-up", this.handlerInteractiveUp);
 
         this.objectsToCheck.forEach((objToRemove) => {
             const index = this.interactiveControls.objectsToCheck.findIndex(
@@ -199,7 +198,8 @@ export default class AtomNavigator extends EventEmitter {
                     undefined
                 );
             });
-            this.emit("change-view", {
+            this.dispatchEvent({
+                type: "change-view", 
                 viewKey: this.electronsConfig[selectedElectronUuid].viewKey,
             });
         }
@@ -255,7 +255,8 @@ export default class AtomNavigator extends EventEmitter {
                         electronTrail.children[0].matrixWorld
                     );
                     this.scene.add(this.electronHighlighter);
-                    this.emit("electron-hovered", {
+                    this.dispatchEvent({ 
+                        type: "electron-hovered",
                         viewKey: this.electronsConfig[uuid].viewKey,
                     });
                 }

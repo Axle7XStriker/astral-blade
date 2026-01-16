@@ -1,8 +1,7 @@
-import EventEmitter from "events";
 import * as THREE from "three";
 
 /** Provides users with the ability to interact with various elements of the experience. */
-export default class InteractiveControls extends EventEmitter {
+export default class InteractiveControls extends THREE.EventDispatcher {
     #enabled;
 
     get enabled() {
@@ -127,7 +126,7 @@ export default class InteractiveControls extends EventEmitter {
         // is dragging
         if (this.selected && this.isDown) {
             if (this.raycaster.ray.intersectPlane(this.plane, this.intersection)) {
-                this.emit('interactive-drag', { object: this.selected, position: this.intersection.sub(this.offset) });
+                this.dispatchEvent({ type: 'interactive-drag', object: this.selected, position: this.intersection.sub(this.offset) });
             }
             return;
         }
@@ -145,17 +144,17 @@ export default class InteractiveControls extends EventEmitter {
             );
 
             if (this.hovered !== object) {
-                this.emit("interactive-out", { object: this.hovered });
-                this.emit("interactive-over", { object });
+                this.dispatchEvent({ type: "interactive-out", object: this.hovered });
+                this.dispatchEvent({ type: "interactive-over", object });
                 this.hovered = object;
             } else {
-                this.emit("interactive-move", { object, intersectionData: this.intersectionData });
+                this.dispatchEvent({ type: "interactive-move", object, intersectionData: this.intersectionData });
             }
         } else {
             this.intersectionData = null;
 
             if (this.hovered !== null) {
-                this.emit("interactive-out", { object: this.hovered });
+                this.dispatchEvent({ type: "interactive-out", object: this.hovered });
                 this.hovered = null;
             }
         }
@@ -170,7 +169,7 @@ export default class InteractiveControls extends EventEmitter {
         this.isDown = true;
         this.#onMove(e);
 
-        this.emit("interactive-down", {
+        this.dispatchEvent({ type: "interactive-down",
             object: this.hovered,
             previous: this.selected,
             intersectionData: this.intersectionData,
@@ -192,7 +191,7 @@ export default class InteractiveControls extends EventEmitter {
         if (!this.isDown) return;
         this.isDown = false;
 
-        this.emit("interactive-up", { object: this.hovered });
+        this.dispatchEvent({ type: "interactive-up", object: this.hovered });
     }
 
     /**
@@ -203,7 +202,7 @@ export default class InteractiveControls extends EventEmitter {
     #onLeave(e) {
         this.#onUp(e);
 
-        this.emit("interactive-out", { object: this.hovered });
+        this.dispatchEvent({ type: "interactive-out", object: this.hovered });
         this.hovered = null;
     }
 }
