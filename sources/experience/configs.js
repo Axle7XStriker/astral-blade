@@ -4,10 +4,10 @@ const VIEWS = {
         footerText: "About Me",
         color: "#ffffff",      // Neon white
     },
-    work: {
-        footerText: "Work",
-        color: "#ff005d",      // Neon red
-    },
+    // work: {
+    //     footerText: "Work",
+    //     color: "#ff005d",      // Neon red
+    // },
     music: {
         footerText: "Music",
         color: "#ff9900",      // Neon orange
